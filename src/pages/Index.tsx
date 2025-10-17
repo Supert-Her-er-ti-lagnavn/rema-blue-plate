@@ -3,6 +3,9 @@ import { MealCard } from "@/components/MealCard";
 import { WeeklyPlanner } from "@/components/WeeklyPlanner";
 import { ShoppingList } from "@/components/ShoppingList";
 
+const zeroSampleMeals = [
+
+];  
 const sampleMeals = [
   {
     title: "Chicken Tikka Masala",
@@ -52,7 +55,7 @@ const Index = () => {
       
       <div className="max-w-7xl mx-auto px-4 py-16 space-y-16">
         <section>
-          <ShoppingList meals={sampleMeals} />
+          <ShoppingList meals={zeroSampleMeals} />
         </section>
 
         <section>

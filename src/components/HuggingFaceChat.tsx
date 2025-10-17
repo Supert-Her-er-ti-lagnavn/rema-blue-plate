@@ -1,0 +1,285 @@
+import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
+import { MessageCircle, Send, Trash2, Bot, User } from 'lucide-react';
+
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
+interface HuggingFaceChatProps {
+  isMinimized?: boolean;
+  onToggleMinimize?: () => void;
+}
+
+export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: HuggingFaceChatProps) {
+  // Preset configuration (hidden from user)
+  const PRESET_CONFIG = {
+    model: import.meta.env.VITE_DEFAULT_MODEL || 'meta-llama/Meta-Llama-3-8B-Instruct',
+    modelName: 'Llama 3 8B Instruct',
+    temperature: parseFloat(import.meta.env.VITE_DEFAULT_TEMPERATURE || '0.7'),
+    maxTokens: parseInt(import.meta.env.VITE_DEFAULT_MAX_TOKENS || '300'),
+    baseUrl: 'https://router.huggingface.co/v1/chat/completions'
+  };
+
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [hfToken, setHfToken] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Load token from localStorage or environment
+  useEffect(() => {
+    const savedToken = localStorage.getItem('hf_token');
+    if (savedToken) {
+      setHfToken(savedToken);
+    } else if (import.meta.env.VITE_HF_TOKEN && import.meta.env.VITE_HF_TOKEN !== 'your_hf_token_here') {
+      setHfToken(import.meta.env.VITE_HF_TOKEN);
+    }
+  }, []);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Save token
+  const saveToken = (token: string) => {
+    setHfToken(token);
+    localStorage.setItem('hf_token', token);
+  };
+
+  // Generate unique ID
+  const generateId = () => Date.now().toString() + Math.random().toString(36).substr(2, 9);
+
+  // Call Hugging Face API (Router API - OpenAI compatible format)
+  const callHuggingFaceAPI = async (userMessage: string): Promise<string> => {
+    if (!hfToken) {
+      throw new Error('Hugging Face token is required');
+    }
+
+    const response = await fetch(PRESET_CONFIG.baseUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${hfToken}`,
+      },
+      body: JSON.stringify({
+        model: PRESET_CONFIG.model,
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful cooking and meal planning assistant. Help users with recipes, meal planning, ingredient substitutions, and cooking tips. Be concise and practical.'
+          },
+          {
+            role: 'user',
+            content: userMessage
+          }
+        ],
+        max_tokens: PRESET_CONFIG.maxTokens,
+        temperature: PRESET_CONFIG.temperature
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content || 'No response received';
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+    
+    if (!hfToken) {
+      alert('Please enter your Hugging Face token first');
+      return;
+    }
+
+    const userMessage: Message = {
+      id: generateId(),
+      role: 'user',
+      content: input.trim(),
+      timestamp: new Date(),
+    };
+
+    setMessages((prev: Message[]) => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
+
+    try {
+      const response = await callHuggingFaceAPI(userMessage.content);
+      
+      const assistantMessage: Message = {
+        id: generateId(),
+        role: 'assistant',
+        content: response,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev: Message[]) => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Error calling Hugging Face:', error);
+      const errorMessage: Message = {
+        id: generateId(),
+        role: 'assistant',
+        content: `Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
+        timestamp: new Date(),
+      };
+      setMessages((prev: Message[]) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const clearChat = () => {
+    setMessages([]);
+  };
+
+  if (isMinimized) {
+    return (
+      <div className="fixed bottom-4 right-4 z-50">
+        <button
+          onClick={onToggleMinimize}
+          className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-105"
+        >
+          <MessageCircle className="w-6 h-6" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed bottom-4 right-4 z-50 w-96 h-[500px] bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-t-lg flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Bot className="w-5 h-5" />
+          <h3 className="font-semibold">🍳 Recipe Assistant</h3>
+        </div>
+        <button
+          onClick={onToggleMinimize}
+          className="text-white/80 hover:text-white transition-colors"
+        >
+          <MessageCircle className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Token Input (if needed) */}
+      {!hfToken && (
+        <div className="p-3 bg-yellow-50 border-b border-yellow-200">
+          <div className="flex gap-2 items-center">
+            <input
+              type="password"
+              placeholder="Enter HuggingFace token..."
+              onChange={(e: ChangeEvent<HTMLInputElement>) => saveToken(e.target.value)}
+              className="flex-1 px-2 py-1 text-sm border border-yellow-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <a 
+              href="https://huggingface.co/settings/tokens" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-xs text-blue-600 hover:text-blue-800"
+            >
+              Get Token
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+        {messages.length === 0 ? (
+          <div className="text-center text-gray-500 mt-8">
+            <Bot className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+            <p className="text-sm">Ask me about recipes, ingredients, or cooking tips!</p>
+          </div>
+        ) : (
+          messages.map((message: Message) => (
+            <div
+              key={message.id}
+              className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div className={`max-w-[80%] rounded-lg p-3 ${
+                message.role === 'user'
+                  ? 'bg-blue-600 text-white ml-auto'
+                  : 'bg-white border border-gray-200'
+              }`}>
+                <div className="flex items-center gap-2 mb-1">
+                  {message.role === 'user' ? (
+                    <User className="w-3 h-3" />
+                  ) : (
+                    <Bot className="w-3 h-3" />
+                  )}
+                  <span className="text-xs font-medium opacity-75">
+                    {message.role === 'user' ? 'You' : 'Assistant'}
+                  </span>
+                </div>
+                <div className="text-sm whitespace-pre-wrap">
+                  {message.content}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+        
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="bg-white border border-gray-200 rounded-lg p-3 max-w-[80%]">
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1">
+                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                </div>
+                <span className="text-sm text-gray-500">Assistant is thinking...</span>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input Form */}
+      <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 bg-white rounded-b-lg">
+        <div className="flex gap-2 items-end">
+          <textarea
+            value={input}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit(e);
+              }
+            }}
+            placeholder={hfToken ? "Ask about recipes, ingredients..." : "Enter token above first"}
+            disabled={!hfToken || isLoading}
+            rows={1}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+          />
+          <button
+            type="submit"
+            disabled={!input.trim() || !hfToken || isLoading}
+            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white p-2 rounded-lg transition-colors"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+          {messages.length > 0 && (
+            <button
+              type="button"
+              onClick={clearChat}
+              className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </form>
+    </div>
+  );
+}
