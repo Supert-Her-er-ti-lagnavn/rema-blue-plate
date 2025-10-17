@@ -1,6 +1,7 @@
 import { Hero } from "@/components/Hero";
 import { MealCard } from "@/components/MealCard";
 import { WeeklyPlanner } from "@/components/WeeklyPlanner";
+import { ShoppingList } from "@/components/ShoppingList";
 
 const sampleMeals = [
   {
@@ -50,6 +51,10 @@ const Index = () => {
       <Hero />
       
       <div className="max-w-7xl mx-auto px-4 py-16 space-y-16">
+        <section>
+          <ShoppingList meals={sampleMeals} />
+        </section>
+
         <section>
           <h2 className="text-3xl font-bold text-foreground mb-8">Popular Recipes</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
