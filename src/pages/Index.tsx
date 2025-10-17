@@ -56,7 +56,7 @@ const Index = () => {
         </section>
 
         <section>
-          <h2 className="text-3xl font-bold text-foreground mb-8">Popular Recipes</h2>
+          <h2 className="text-3xl font-black text-foreground mb-8 uppercase tracking-tight">Popular Recipes</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sampleMeals.map((meal, index) => (
               <MealCard key={index} {...meal} />

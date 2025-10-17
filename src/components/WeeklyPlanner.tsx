@@ -23,12 +23,12 @@ export const WeeklyPlanner = () => {
   
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3">
-          <Calendar className="w-6 h-6 text-primary" />
-          <h2 className="text-3xl font-bold text-foreground">This Week's Plan</h2>
+          <Calendar className="w-6 h-6 text-primary" strokeWidth={2.5} />
+          <h2 className="text-3xl font-black text-foreground uppercase tracking-tight">This Week's Plan</h2>
         </div>
-        <Badge variant="secondary" className="text-lg px-4 py-2">
+        <Badge className="text-lg px-4 py-2 font-black bg-primary text-primary-foreground">
           Total: {totalWeeklyCost} kr
         </Badge>
       </div>
@@ -37,26 +37,26 @@ export const WeeklyPlanner = () => {
         {weeklyMeals.map((item, index) => (
           <Card 
             key={index} 
-            className="p-4 transition-all duration-200 hover:shadow-[var(--shadow-card)] bg-gradient-to-r from-card to-accent/10"
+            className="p-4 transition-all duration-200 hover:shadow-lg"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-24 font-semibold text-primary">{item.day}</div>
-                <div className="text-foreground font-medium">{item.meal}</div>
+                <div className="w-24 font-black text-primary uppercase text-sm">{item.day}</div>
+                <div className="text-foreground font-bold">{item.meal}</div>
               </div>
-              <div className="font-bold text-lg text-foreground">{item.cost} kr</div>
+              <div className="font-black text-lg text-foreground">{item.cost} kr</div>
             </div>
           </Card>
         ))}
       </div>
 
-      <Card className="p-6 bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/20">
-        <div className="flex items-center justify-between">
+      <Card className="p-6 bg-secondary border-2 border-primary">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h3 className="text-xl font-bold text-foreground mb-1">Weekly Shopping Total</h3>
-            <p className="text-muted-foreground">All ingredients included</p>
+            <h3 className="text-xl font-black text-foreground mb-1 uppercase">Weekly Shopping Total</h3>
+            <p className="text-muted-foreground font-semibold">All ingredients included</p>
           </div>
-          <div className="text-4xl font-bold text-primary">{totalWeeklyCost} kr</div>
+          <div className="text-4xl font-black text-primary">{totalWeeklyCost} kr</div>
         </div>
       </Card>
     </div>

@@ -31,36 +31,36 @@ export const ShoppingList = ({ meals }: ShoppingListProps) => {
   const totalCost = consolidatedIngredients.reduce((sum, item) => sum + item.price, 0);
 
   return (
-    <Card className="p-6 bg-gradient-to-br from-card to-accent/20">
+    <Card className="p-6 bg-card">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 rounded-full bg-primary/10">
-          <ShoppingCart className="w-6 h-6 text-primary" />
+        <div className="p-3 rounded-full bg-primary">
+          <ShoppingCart className="w-6 h-6 text-primary-foreground" strokeWidth={2.5} />
         </div>
         <div>
-          <h3 className="text-2xl font-bold text-foreground">Shopping List</h3>
-          <p className="text-sm text-muted-foreground">All groceries you need to buy</p>
+          <h3 className="text-2xl font-black text-foreground uppercase tracking-tight">Shopping List</h3>
+          <p className="text-sm text-muted-foreground font-semibold">All groceries you need to buy</p>
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {consolidatedIngredients.map((ingredient, index) => (
           <div 
             key={index} 
-            className="flex justify-between items-center p-3 rounded-lg bg-background/50 border border-border"
+            className="flex justify-between items-center p-3 rounded-lg bg-secondary border border-border"
           >
             <div>
-              <span className="font-medium text-foreground">{ingredient.name}</span>
-              <span className="text-sm text-muted-foreground ml-2">({ingredient.amount})</span>
+              <span className="font-bold text-foreground">{ingredient.name}</span>
+              <span className="text-sm text-muted-foreground ml-2 font-semibold">({ingredient.amount})</span>
             </div>
-            <span className="font-semibold text-primary">{ingredient.price} kr</span>
+            <span className="font-black text-primary text-lg">{ingredient.price} kr</span>
           </div>
         ))}
       </div>
 
-      <div className="mt-6 pt-6 border-t border-border">
+      <div className="mt-6 pt-6 border-t-2 border-primary">
         <div className="flex justify-between items-center">
-          <span className="text-lg font-semibold text-foreground">Total Cost</span>
-          <span className="text-2xl font-bold text-primary">{totalCost} kr</span>
+          <span className="text-lg font-black text-foreground uppercase">Total Cost</span>
+          <span className="text-3xl font-black text-primary">{totalCost} kr</span>
         </div>
       </div>
     </Card>
