@@ -13,9 +13,10 @@ interface Message {
 interface HuggingFaceChatProps {
   isMinimized?: boolean;
   onToggleMinimize?: () => void;
+  inline?: boolean;
 }
 
-export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: HuggingFaceChatProps) {
+export function HuggingFaceChat({ isMinimized = false, onToggleMinimize, inline = false }: HuggingFaceChatProps) {
   const mealListPrompt = `Here are the available meals:\n${sampleMeals.map(meal => `- ${meal.title}: ${meal.ingredients.map(i => i.name).join(', ')}`).join('\n')}\nAlways suggest meals from this list in your responses, using this format.`;
   const extractMealSuggestion = (assistantText: string) => {
     for (const meal of sampleMeals) {
@@ -187,19 +188,21 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: Huggi
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-96 h-[500px] bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col">
+    <div className={inline ? "h-full bg-card rounded-lg shadow-lg border border-border flex flex-col" : "fixed bottom-4 right-4 z-50 w-96 h-[500px] bg-card rounded-lg shadow-2xl border border-border flex flex-col"}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-t-lg flex items-center justify-between">
+      <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-4 rounded-t-lg flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Bot className="w-5 h-5" />
           <h3 className="font-semibold">🍳 Recipe Assistant</h3>
         </div>
-        <button
-          onClick={onToggleMinimize}
-          className="text-white/80 hover:text-white transition-colors"
-        >
-          <MessageCircle className="w-4 h-4" />
-        </button>
+        {onToggleMinimize && (
+          <button
+            onClick={onToggleMinimize}
+            className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+          >
+            <MessageCircle className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Token Input (if needed) */}
@@ -225,10 +228,10 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: Huggi
       )}
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/30">
         {messages.length === 0 ? (
-          <div className="text-center text-gray-500 mt-8">
-            <Bot className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+          <div className="text-center text-muted-foreground mt-8">
+            <Bot className="w-8 h-8 mx-auto mb-2 text-muted-foreground/60" />
             <p className="text-sm">Ask me about recipes, ingredients, or cooking tips!</p>
           </div>
         ) : (
@@ -239,8 +242,8 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: Huggi
             >
               <div className={`max-w-[80%] rounded-lg p-3 ${
                 message.role === 'user'
-                  ? 'bg-blue-600 text-white ml-auto'
-                  : 'bg-white border border-gray-200'
+                  ? 'bg-primary text-primary-foreground ml-auto'
+                  : 'bg-card border border-border'
               }`}>
                 <div className="flex items-center gap-2 mb-1">
                   {message.role === 'user' ? (
@@ -262,14 +265,14 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: Huggi
         
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-white border border-gray-200 rounded-lg p-3 max-w-[80%]">
+            <div className="bg-card border border-border rounded-lg p-3 max-w-[80%]">
               <div className="flex items-center gap-2">
                 <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
                 </div>
-                <span className="text-sm text-gray-500">Assistant is thinking...</span>
+                <span className="text-sm text-muted-foreground">Assistant is thinking...</span>
               </div>
             </div>
           </div>
@@ -290,7 +293,7 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: Huggi
       </div>
 
       {/* Input Form */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 bg-white rounded-b-lg">
+      <form onSubmit={handleSubmit} className="p-4 border-t border-border bg-card rounded-b-lg">
         <div className="flex gap-2 items-end">
           <textarea
             value={input}
@@ -304,12 +307,12 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: Huggi
             placeholder={hfToken ? "Ask about recipes, ingredients..." : "Enter token above first"}
             disabled={!hfToken || isLoading}
             rows={1}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            className="flex-1 px-3 py-2 border border-input rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent text-sm bg-background"
           />
           <button
             type="submit"
             disabled={!input.trim() || !hfToken || isLoading}
-            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white p-2 rounded-lg transition-colors"
+            className="bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground text-primary-foreground p-2 rounded-lg transition-colors"
           >
             <Send className="w-4 h-4" />
           </button>
@@ -317,7 +320,7 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: Huggi
             <button
               type="button"
               onClick={clearChat}
-              className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors"
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground p-2 rounded-lg transition-colors"
             >
               <Trash2 className="w-4 h-4" />
             </button>

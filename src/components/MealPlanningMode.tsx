@@ -2,6 +2,7 @@
 import React from 'react';
 import { MealCard } from "@/components/MealCard";
 import { ShoppingList } from "@/components/ShoppingList";
+import { HuggingFaceChat } from "@/components/HuggingFaceChat";
 import { useShoppingContext } from "@/contexts/useShoppingContext";
 import { sampleMeals } from "@/components/sampleMeals";
 
@@ -68,35 +69,39 @@ export const MealPlanningMode: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 py-8 pb-24 space-y-16">
-        {/* SECTION 1: MODE HEADER */}
-        <section>
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-black text-foreground mb-2 uppercase tracking-tight">
-              📅 Meal Planning
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Plan your weekly meals and discover new recipes
-            </p>
-          </div>
-        </section>
+      {/* Header */}
+      <div className="text-center py-6 border-b border-border">
+        <h2 className="text-3xl font-black text-foreground mb-2 uppercase tracking-tight">
+          📅 Meal Planning
+        </h2>
+        <p className="text-muted-foreground">
+          Plan your weekly meals and discover new recipes
+        </p>
+      </div>
 
-        {/* SECTION 2: SHOPPING LIST - Now context-driven */}
-        <section>
+      {/* Three Column Layout: 1/6 Shopping List, 3/6 Recipes, 2/6 Chatbot */}
+      <div className="flex gap-4 p-4 h-[calc(100vh-140px)]">
+        {/* Shopping List - 1/6 */}
+        <div className="flex-[1] overflow-y-auto">
           <ShoppingList />
-        </section>
+        </div>
 
-        {/* SECTION 4: POPULAR RECIPES - Add to shopping list via context and fridge logic */}
-        <section>
-          <h2 className="text-3xl font-black text-foreground mb-8 uppercase tracking-tight">
+        {/* Popular Recipes - 3/6 */}
+        <div className="flex-[3] overflow-y-auto">
+          <h2 className="text-3xl font-black text-foreground mb-6 uppercase tracking-tight">
             Popular Recipes
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
             {sampleMeals.map((meal, index) => (
               <MealCard key={index} {...meal} mealIndex={index + 1} handleAddMeal={() => handleAddMeal(meal, index + 1)} />
             ))}
           </div>
-        </section>
+        </div>
+
+        {/* Chatbot - 2/6 */}
+        <div className="flex-[2]">
+          <HuggingFaceChat isMinimized={false} inline={true} />
+        </div>
       </div>
     </div>
   );
