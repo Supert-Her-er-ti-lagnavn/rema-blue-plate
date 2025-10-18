@@ -19,8 +19,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       {children}
       {show && (
         <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
-          <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg font-bold animate-scale-in">
-            ✓ Lagt til i kjøleskapet
+          <div className="bg-primary text-primary-foreground px-6 py-3 rounded-lg shadow-lg font-bold animate-scale-in">
+            🛒 Oppskrift lagt til i handlelisten!
           </div>
         </div>
       )}
