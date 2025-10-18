@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api import meals, shopping
 
 # Create FastAPI app
 app = FastAPI(
@@ -17,25 +18,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Sample meal data
-SAMPLE_MEALS = [
-    {
-        "id": 1,
-        "title": "Pasta Alfredo med Kylling",
-        "image": "https://www.rema.no/acd-cgi/img/v1/wordpress/wp-content/uploads/2025/10/IMG_3833-1-1920x1080.jpg?width=660",
-        "prep_time": 35,
-        "servings": 4,
-        "total_cost": 95.0,
-    },
-    {
-        "id": 2,
-        "title": "Marry Me Chicken",
-        "image": "https://www.rema.no/acd-cgi/img/v1/wordpress/wp-content/uploads/2025/03/REMA1000-SP8-9-Merry-me-chicken-B-e1754460393872-1920x1080.jpg?width=660",
-        "prep_time": 45,
-        "servings": 4,
-        "total_cost": 110.0,
-    }
-]
+# Include API routers with dummy data
+app.include_router(meals.router, prefix="/api/v1/meals", tags=["meals"])
+app.include_router(shopping.router, prefix="/api/v1/shopping", tags=["shopping"])
 
 # API Routes
 @app.get("/")
@@ -45,17 +30,6 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "version": "1.0.0"}
-
-@app.get("/api/v1/meals/")
-async def get_meals():
-    return SAMPLE_MEALS
-
-@app.get("/api/v1/meals/{meal_id}")
-async def get_meal(meal_id: int):
-    for meal in SAMPLE_MEALS:
-        if meal["id"] == meal_id:
-            return meal
-    return {"error": "Meal not found"}
 
 if __name__ == "__main__":
     import uvicorn
