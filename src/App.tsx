@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import ShoppingPage from "./pages/ShoppingPage";
 import NotFound from "./pages/NotFound";
 import { ShoppingProvider } from "@/contexts/ShoppingContext";
+import { FridgeMode } from '@/components/FridgeMode';
 
 const queryClient = new QueryClient();
 
@@ -32,9 +33,18 @@ const App = () => {
             {/* Cross-state Header - appears on all pages */}
             <Header />
             <Routes>
-              <Route path="/" element={
-                isShoppingMode ? <ShoppingPage /> : <Index isShoppingMode={isShoppingMode} />
-              } />
+              <Route
+                path="/"
+                element={
+                  currentMode === 'shopping' ? (
+                    <ShoppingPage />
+                  ) : currentMode === 'fridge' ? (
+                    <FridgeMode /> // Add a component for fridge mode if it exists
+                  ) : (
+                    <Index currentMode={currentMode} />
+                  )
+                }
+              />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
