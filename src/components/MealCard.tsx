@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, Users, Plus } from "lucide-react";
+import { useShoppingContext } from "@/contexts/ShoppingContext";
 
 interface Ingredient {
   name: string;
@@ -16,10 +17,27 @@ interface MealCardProps {
   servings: number;
   ingredients: Ingredient[];
   totalCost: number;
-  onAddMeal?: () => void;
+  mealIndex?: number;
 }
 
-export const MealCard = ({ title, image, prepTime, servings, ingredients, totalCost, onAddMeal }: MealCardProps) => {
+export const MealCard = ({ title, image, prepTime, servings, ingredients, totalCost, mealIndex }: MealCardProps) => {
+  const { addItemsToShoppingList } = useShoppingContext();
+
+  const handleAddMeal = () => {
+    addItemsToShoppingList(
+      ingredients.map((ing, i) => ({
+        id: Number(`${mealIndex || 0}${i + 1}${ing.name.length}${title.length}`),
+        name: ing.name,
+        quantity: parseInt(ing.amount) || 1,
+        category: "",
+        aisle: 1,
+        checked: false,
+        price: ing.price,
+        mealId: mealIndex || 0,
+      }))
+    );
+  };
+
   return (
     <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg">
       <div className="aspect-video relative overflow-hidden bg-muted">
@@ -66,7 +84,7 @@ export const MealCard = ({ title, image, prepTime, servings, ingredients, totalC
         <Button 
           className="w-full gap-2 font-bold uppercase text-sm" 
           variant="default"
-          onClick={onAddMeal}
+          onClick={handleAddMeal}
         >
           <Plus className="w-4 h-4" />
           Add to Meal Plan

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+
+import React from 'react';
 import { MealCard } from "@/components/MealCard";
 import { WeeklyPlanner } from "@/components/WeeklyPlanner";
 import { ShoppingList } from "@/components/ShoppingList";
+import { useShoppingContext } from "@/contexts/ShoppingContext";
 
 interface Meal {
   title: string;
@@ -16,7 +18,7 @@ interface Meal {
   }>;
 }
 
-const sampleMeals: Meal[] = [
+export const sampleMeals: Meal[] = [
   {
     title: "Pasta Alfredo med Kylling",
     image: "https://www.rema.no/acd-cgi/img/v1/wordpress/wp-content/uploads/2025/10/IMG_3833-1-1920x1080.jpg?width=660",
@@ -136,27 +138,9 @@ const sampleMeals: Meal[] = [
   },
 ];
 
+
 export const MealPlanningMode: React.FC = () => {
-  const [addedMeals, setAddedMeals] = useState<Meal[]>([]);
-
-  const handleAddMeal = (meal: Meal) => {
-    setAddedMeals([...addedMeals, meal]);
-  };
-
-  const handleRemoveIngredient = (ingredientName: string) => {
-    // Remove all instances of this ingredient from all meals
-    const updatedMeals = addedMeals.map(meal => ({
-      ...meal,
-      ingredients: meal.ingredients.filter(ing => ing.name !== ingredientName)
-    })).filter(meal => meal.ingredients.length > 0); // Remove meals with no ingredients
-    
-    setAddedMeals(updatedMeals);
-  };
-
-  const handleRemoveMeal = (mealIndex: number) => {
-    const updatedMeals = addedMeals.filter((_, index) => index !== mealIndex);
-    setAddedMeals(updatedMeals);
-  };
+  const { addItemsToShoppingList, removeItemFromList } = useShoppingContext();
 
   return (
     <div className="min-h-screen bg-background">
@@ -175,28 +159,27 @@ export const MealPlanningMode: React.FC = () => {
           </div>
         </section>
 
-        {/* SECTION 2: SHOPPING LIST - Easy to replace */}
+
+        {/* SECTION 2: SHOPPING LIST - Now context-driven */}
         <section>
-          <ShoppingList 
-            meals={addedMeals} 
-            onRemoveIngredient={handleRemoveIngredient}
-            onRemoveMeal={handleRemoveMeal}
-          />
+          <ShoppingList />
         </section>
 
-        {/* SECTION 3: WEEKLY PLANNER - Easy to replace */}
-        <section>
-          <WeeklyPlanner meals={addedMeals} onRemoveMeal={handleRemoveMeal} />
-        </section>
 
-        {/* SECTION 4: POPULAR RECIPES - Easy to replace */}
+        {/* SECTION 3: WEEKLY PLANNER - (optional: update to use context if needed) */}
+        {/* <section>
+          <WeeklyPlanner />
+        </section> */}
+
+
+        {/* SECTION 4: POPULAR RECIPES - Add to shopping list via context */}
         <section>
           <h2 className="text-3xl font-black text-foreground mb-8 uppercase tracking-tight">
             Popular Recipes
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sampleMeals.map((meal, index) => (
-              <MealCard key={index} {...meal} onAddMeal={() => handleAddMeal(meal)} />
+              <MealCard key={index} {...meal} mealIndex={index + 1} />
             ))}
           </div>
         </section>
