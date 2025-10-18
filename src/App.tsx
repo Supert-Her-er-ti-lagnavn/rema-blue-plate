@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import { ShoppingProvider } from "@/contexts/ShoppingContext";
 import { PreferencesProvider } from "@/contexts/PreferencesContext";
 import { FridgeMode } from '@/components/FridgeMode';
+import { NotificationProvider } from '@/contexts/NotificationContext';
 
 const queryClient = new QueryClient();
 
@@ -30,12 +31,13 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <PreferencesProvider>
         <ShoppingProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            {/* Cross-state Header - appears on all pages */}
-            <Header />
+          <NotificationProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                {/* Cross-state Header - appears on all pages */}
+                <Header />
             <Routes>
               <Route
                 path="/"
@@ -56,10 +58,11 @@ const App = () => {
             </Routes>
             {/* Global Chat Widget - appears on all pages */}
             <ChatWidget />
-            {/* Sticky Toggle at Bottom - appears on all pages */}
-            <SegmentedToggle onToggle={handleModeToggle} />
-          </BrowserRouter>
-        </TooltipProvider>
+                {/* Sticky Toggle at Bottom - appears on all pages */}
+                <SegmentedToggle onToggle={handleModeToggle} />
+              </BrowserRouter>
+            </TooltipProvider>
+          </NotificationProvider>
         </ShoppingProvider>
       </PreferencesProvider>
     </QueryClientProvider>
