@@ -140,7 +140,20 @@ export const MealPlanningMode: React.FC = () => {
   const [addedMeals, setAddedMeals] = useState<Meal[]>([]);
 
   const handleAddMeal = (meal: Meal) => {
-    setAddedMeals([...addedMeals, meal]);
+    const fridgeItems = JSON.parse(localStorage.getItem('fridgeItems') || '[]');
+    const fridgeItemNames = fridgeItems.map((item: any) => item.name.toLowerCase());
+    
+    // Filter out ingredients that are already in the fridge
+    const neededIngredients = meal.ingredients.filter(
+      (ingredient) => !fridgeItemNames.includes(ingredient.name.toLowerCase())
+    );
+    
+    // If all ingredients are in the fridge, don't add to shopping list
+    if (neededIngredients.length === 0) {
+      setAddedMeals([...addedMeals, { ...meal, ingredients: [] }]);
+    } else {
+      setAddedMeals([...addedMeals, { ...meal, ingredients: neededIngredients }]);
+    }
   };
 
   const handleRemoveIngredient = (ingredientName: string) => {
