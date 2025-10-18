@@ -32,22 +32,28 @@ export const MealCard = ({ title, image, prepTime, servings, ingredients, totalC
   const [isAdding, setIsAdding] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
 
-  // Use custom handler if provided (for fridge logic), else fallback to default
-  const onAdd = handleAddMeal || (() => {
+  // Wrap handler to always trigger animations
+  const onAdd = () => {
     setIsAdding(true);
     
-    addItemsToShoppingList(
-      ingredients.map((ing, i) => ({
-        id: Number(`${mealIndex || 0}${i + 1}${ing.name.length}${title.length}${Date.now()}`),
-        name: ing.name,
-        quantity: parseInt(ing.amount) || 1,
-        category: "",
-        aisle: 1,
-        checked: false,
-        price: ing.price,
-        mealId: mealIndex || 0,
-      }))
-    );
+    if (handleAddMeal) {
+      // Use custom handler (for fridge logic)
+      handleAddMeal();
+    } else {
+      // Default handler
+      addItemsToShoppingList(
+        ingredients.map((ing, i) => ({
+          id: Number(`${mealIndex || 0}${i + 1}${ing.name.length}${title.length}${Date.now()}`),
+          name: ing.name,
+          quantity: parseInt(ing.amount) || 1,
+          category: "",
+          aisle: 1,
+          checked: false,
+          price: ing.price,
+          mealId: mealIndex || 0,
+        }))
+      );
+    }
 
     showFridgeNotification();
 
@@ -56,7 +62,7 @@ export const MealCard = ({ title, image, prepTime, servings, ingredients, totalC
       setJustAdded(true);
       setTimeout(() => setJustAdded(false), 1000);
     }, 300);
-  });
+  };
 
   return (
     <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg">
