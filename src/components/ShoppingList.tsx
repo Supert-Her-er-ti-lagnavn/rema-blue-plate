@@ -5,6 +5,7 @@ import { useShoppingContext } from "@/contexts/useShoppingContext";
 import { sampleMeals } from "@/components/sampleMeals";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { apiService } from "@/services/api";
 
 export const ShoppingList = () => {
   const {
@@ -14,6 +15,7 @@ export const ShoppingList = () => {
     clearShoppingList,
     getCompletedCount,
     getTotalCount,
+    recordPurchaseAndRemove,
   } = useShoppingContext();
 
   const [monthlyBudget, setMonthlyBudget] = useState(5000);
@@ -44,20 +46,21 @@ export const ShoppingList = () => {
     }
   }, 0);
 
-  // Calculate spent amount (only checked items)
-  const seenSpent = new Set<string>();
-  const spentAmount = shoppingList.reduce((sum, item) => {
-    if (!item.checked) return sum;
-    const key = `${item.name}|${item.mealId || ''}`;
-    if (seenSpent.has(key)) return sum;
-    seenSpent.add(key);
-    const qty = Number(item.quantity);
-    if (!isNaN(qty) && qty > 1 && qty < 20) {
-      return sum + (item.price * qty);
-    } else {
-      return sum + item.price;
+  // Spent amount fetched from backend monthly purchases
+  const [spentAmount, setSpentAmount] = useState(0);
+
+  const refreshMonthlySpent = async () => {
+    try {
+      const res = await apiService.getCurrentMonthPurchases();
+      setSpentAmount(res.total_spent || 0);
+    } catch (e) {
+      // keep UI functional even if backend not available
     }
-  }, 0);
+  };
+
+  useEffect(() => {
+    refreshMonthlySpent();
+  }, []);
 
   const budgetPercentage = (spentAmount / monthlyBudget) * 100;
   const halfBudgetReached = spentAmount >= monthlyBudget * 0.5;
@@ -120,11 +123,26 @@ export const ShoppingList = () => {
                   <div className="flex items-center gap-2">
                     <span className="font-black text-primary text-lg">{item.price} kr</span>
                     {!item.checked && (
-                      <Button variant="ghost" size="icon" onClick={() => markItemFound(item.id)} title="Mark as found">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={async () => {
+                          // Mark found (to update fridge) then record purchase and remove
+                          markItemFound(item.id);
+                          await recordPurchaseAndRemove(item.id);
+                          refreshMonthlySpent();
+                        }}
+                        title="Mark as found"
+                      >
                         <Check className="h-4 w-4 text-green-600" />
                       </Button>
                     )}
-                    <Button variant="ghost" size="icon" onClick={() => removeItemFromList(item.id)} title="Remove">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeItemFromList(item.id)}
+                      title="Remove"
+                    >
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
