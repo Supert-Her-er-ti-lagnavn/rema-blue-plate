@@ -1,15 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useShoppingContext } from '@/contexts/useShoppingContext';
+import { Wallet } from 'lucide-react';
 
 const FindMyIngredient: React.FC = () => {
-  const { getCurrentItem, markItemFound, getCompletedCount, getTotalCount } = useShoppingContext();
+  const { getCurrentItem, markItemFound, getCompletedCount, getTotalCount, shoppingList } = useShoppingContext();
   const [userPosition, setUserPosition] = useState({ x: 450, y: 600 });
   const [pulseAnimation, setPulseAnimation] = useState(false);
+  const [monthlyBudget, setMonthlyBudget] = useState(5000);
+
+  useEffect(() => {
+    const savedProfile = localStorage.getItem('userProfile');
+    if (savedProfile) {
+      const profile = JSON.parse(savedProfile);
+      setMonthlyBudget(profile.monthlyBudget || 5000);
+    }
+  }, []);
 
   const currentItem = getCurrentItem();
   const completedCount = getCompletedCount();
   const totalCount = getTotalCount();
   const progressPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+
+  // Calculate spent amount (only checked items)
+  const seenSpent = new Set<string>();
+  const spentAmount = shoppingList.reduce((sum, item) => {
+    if (!item.checked) return sum;
+    const key = `${item.name}|${item.mealId || ''}`;
+    if (seenSpent.has(key)) return sum;
+    seenSpent.add(key);
+    const qty = Number(item.quantity);
+    if (!isNaN(qty) && qty > 1 && qty < 20) {
+      return sum + (item.price * qty);
+    } else {
+      return sum + item.price;
+    }
+  }, 0);
+
+  const budgetPercentage = (spentAmount / monthlyBudget) * 100;
 
   // Dummy direction and distance logic (replace with real logic if needed)
   const getDirectionData = () => {
@@ -45,6 +72,34 @@ const FindMyIngredient: React.FC = () => {
           <div 
             className="bg-blue-600 h-2 rounded-full transition-all duration-300"
             style={{ width: `${progressPercentage}%` }}
+          ></div>
+        </div>
+      </div>
+
+      {/* Budget indicator */}
+      <div className="mb-6 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Wallet className="w-4 h-4 text-blue-600" />
+            <span className="text-xs font-semibold text-gray-700">Budsjett</span>
+          </div>
+          <div className="text-right">
+            <div className="text-sm font-bold text-blue-600">
+              {spentAmount.toFixed(0)} / {monthlyBudget} kr
+            </div>
+            <div className="text-xs text-gray-600">
+              {budgetPercentage.toFixed(0)}%
+            </div>
+          </div>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+          <div 
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              budgetPercentage >= 75 ? 'bg-red-500' : 
+              budgetPercentage >= 50 ? 'bg-orange-500' : 
+              'bg-green-500'
+            }`}
+            style={{ width: `${Math.min(budgetPercentage, 100)}%` }}
           ></div>
         </div>
       </div>
