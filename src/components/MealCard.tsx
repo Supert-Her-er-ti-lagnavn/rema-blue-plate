@@ -16,9 +16,10 @@ interface MealCardProps {
   servings: number;
   ingredients: Ingredient[];
   totalCost: number;
+  onAddMeal?: () => void;
 }
 
-export const MealCard = ({ title, image, prepTime, servings, ingredients, totalCost }: MealCardProps) => {
+export const MealCard = ({ title, image, prepTime, servings, ingredients, totalCost, onAddMeal }: MealCardProps) => {
   return (
     <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg">
       <div className="aspect-video relative overflow-hidden bg-muted">
@@ -62,7 +63,11 @@ export const MealCard = ({ title, image, prepTime, servings, ingredients, totalC
           </ul>
         </div>
 
-        <Button className="w-full gap-2 font-bold uppercase text-sm" variant="default">
+        <Button 
+          className="w-full gap-2 font-bold uppercase text-sm" 
+          variant="default"
+          onClick={onAddMeal}
+        >
           <Plus className="w-4 h-4" />
           Add to Meal Plan
         </Button>

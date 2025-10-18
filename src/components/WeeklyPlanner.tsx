@@ -1,25 +1,29 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar, X } from "lucide-react";
 
-interface DayMeal {
-  day: string;
-  meal: string;
-  cost: number;
+interface Meal {
+  title: string;
+  prepTime: number;
+  servings: number;
+  totalCost: number;
+  ingredients: Array<{
+    name: string;
+    amount: string;
+    price: number;
+  }>;
 }
 
-const weeklyMeals: DayMeal[] = [
-  { day: "Monday", meal: "Chicken Tikka Masala", cost: 89 },
-  { day: "Tuesday", meal: "Spaghetti Carbonara", cost: 65 },
-  { day: "Wednesday", meal: "Salmon with Vegetables", cost: 125 },
-  { day: "Thursday", meal: "Beef Tacos", cost: 78 },
-  { day: "Friday", meal: "Margherita Pizza", cost: 52 },
-  { day: "Saturday", meal: "Thai Green Curry", cost: 95 },
-  { day: "Sunday", meal: "Roasted Chicken Dinner", cost: 110 },
-];
+interface WeeklyPlannerProps {
+  meals: Meal[];
+  onRemoveMeal?: (index: number) => void;
+}
 
-export const WeeklyPlanner = () => {
-  const totalWeeklyCost = weeklyMeals.reduce((sum, meal) => sum + meal.cost, 0);
+const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+export const WeeklyPlanner = ({ meals, onRemoveMeal }: WeeklyPlannerProps) => {
+  const totalWeeklyCost = meals.reduce((sum, meal) => sum + meal.totalCost, 0);
   
   return (
     <div className="space-y-6">
@@ -33,32 +37,60 @@ export const WeeklyPlanner = () => {
         </Badge>
       </div>
 
-      <div className="grid gap-3">
-        {weeklyMeals.map((item, index) => (
-          <Card 
-            key={index} 
-            className="p-4 transition-all duration-200 hover:shadow-lg"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-24 font-black text-primary uppercase text-sm">{item.day}</div>
-                <div className="text-foreground font-bold">{item.meal}</div>
+      {meals.length === 0 ? (
+        <Card className="p-8 text-center">
+          <p className="text-muted-foreground font-semibold">No meals planned yet</p>
+          <p className="text-sm text-muted-foreground">Add recipes to start planning your week</p>
+        </Card>
+      ) : (
+        <div className="grid gap-3">
+          {meals.map((meal, index) => (
+            <Card 
+              key={index} 
+              className="p-4 transition-all duration-200 hover:shadow-lg group"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4 flex-1">
+                  <div className="w-24 font-black text-primary uppercase text-sm">
+                    {daysOfWeek[index] || `Day ${index + 1}`}
+                  </div>
+                  <div>
+                    <div className="text-foreground font-bold">{meal.title}</div>
+                    <div className="text-xs text-muted-foreground font-semibold">
+                      {meal.prepTime} min • {meal.servings} servings
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="font-black text-lg text-foreground">{meal.totalCost} kr</div>
+                  {onRemoveMeal && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => onRemoveMeal(index)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
-              <div className="font-black text-lg text-foreground">{item.cost} kr</div>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      <Card className="p-6 bg-secondary border-2 border-primary">
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h3 className="text-xl font-black text-foreground mb-1 uppercase">Weekly Shopping Total</h3>
-            <p className="text-muted-foreground font-semibold">All ingredients included</p>
-          </div>
-          <div className="text-4xl font-black text-primary">{totalWeeklyCost} kr</div>
+            </Card>
+          ))}
         </div>
-      </Card>
+      )}
+
+      {meals.length > 0 && (
+        <Card className="p-6 bg-secondary border-2 border-primary">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h3 className="text-xl font-black text-foreground mb-1 uppercase">Weekly Shopping Total</h3>
+              <p className="text-muted-foreground font-semibold">All ingredients included</p>
+            </div>
+            <div className="text-4xl font-black text-primary">{totalWeeklyCost} kr</div>
+          </div>
+        </Card>
+      )}
     </div>
   );
 };
