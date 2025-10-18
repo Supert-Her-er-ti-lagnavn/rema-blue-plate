@@ -2,13 +2,14 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, Users, Plus } from "lucide-react";
-import { useShoppingContext } from "@/contexts/ShoppingContext";
+import { useShoppingContext } from "@/contexts/useShoppingContext";
 
 interface Ingredient {
   name: string;
   amount: string;
   price: number;
 }
+
 
 interface MealCardProps {
   title: string;
@@ -18,12 +19,15 @@ interface MealCardProps {
   ingredients: Ingredient[];
   totalCost: number;
   mealIndex?: number;
+  handleAddMeal?: () => void;
 }
 
-export const MealCard = ({ title, image, prepTime, servings, ingredients, totalCost, mealIndex }: MealCardProps) => {
+
+export const MealCard = ({ title, image, prepTime, servings, ingredients, totalCost, mealIndex, handleAddMeal }: MealCardProps) => {
   const { addItemsToShoppingList } = useShoppingContext();
 
-  const handleAddMeal = () => {
+  // Use custom handler if provided (for fridge logic), else fallback to default
+  const onAdd = handleAddMeal || (() => {
     addItemsToShoppingList(
       ingredients.map((ing, i) => ({
         id: Number(`${mealIndex || 0}${i + 1}${ing.name.length}${title.length}`),
@@ -36,7 +40,7 @@ export const MealCard = ({ title, image, prepTime, servings, ingredients, totalC
         mealId: mealIndex || 0,
       }))
     );
-  };
+  });
 
   return (
     <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg">
@@ -84,7 +88,7 @@ export const MealCard = ({ title, image, prepTime, servings, ingredients, totalC
         <Button 
           className="w-full gap-2 font-bold uppercase text-sm" 
           variant="default"
-          onClick={handleAddMeal}
+          onClick={onAdd}
         >
           <Plus className="w-4 h-4" />
           Add to Meal Plan

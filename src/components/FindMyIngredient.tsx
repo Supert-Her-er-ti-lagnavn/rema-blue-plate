@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useShoppingContext } from '@/contexts/ShoppingContext';
+import { useShoppingContext } from '@/contexts/useShoppingContext';
 
 const FindMyIngredient: React.FC = () => {
   const { getCurrentItem, markItemFound, getCompletedCount, getTotalCount } = useShoppingContext();

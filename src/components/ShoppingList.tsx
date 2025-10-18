@@ -3,8 +3,8 @@ import { Card } from "@/components/ui/card";
 import { ShoppingCart, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import { useShoppingContext } from "@/contexts/ShoppingContext";
-import { sampleMeals } from "@/components/MealPlanningMode";
+import { useShoppingContext } from "@/contexts/useShoppingContext";
+import { sampleMeals } from "@/components/sampleMeals";
 
 export const ShoppingList = () => {
   const {
@@ -25,7 +25,7 @@ export const ShoppingList = () => {
     if (seen.has(key)) return sum;
     seen.add(key);
     // If quantity is a number and less than 20, treat as count, else just add price
-    let qty = Number(item.quantity);
+    const qty = Number(item.quantity);
     if (!isNaN(qty) && qty > 1 && qty < 20) {
       return sum + (item.price * qty);
     } else {

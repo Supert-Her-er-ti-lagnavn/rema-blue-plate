@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { ShoppingContext } from './ShoppingContextInstance';
 
 export interface ShoppingItem {
   id: number;
@@ -9,9 +10,11 @@ export interface ShoppingItem {
   checked: boolean;
   price: number;
   mealId?: number;
+  x_position?: number;
+  y_position?: number;
 }
 
-interface ShoppingContextType {
+export interface ShoppingContextType {
   shoppingList: ShoppingItem[];
   addItemsToShoppingList: (items: ShoppingItem[]) => void;
   markItemFound: (itemId: number) => void;
@@ -23,15 +26,9 @@ interface ShoppingContextType {
   resetShoppingList: () => void;
 }
 
-const ShoppingContext = createContext<ShoppingContextType | undefined>(undefined);
 
-export const useShoppingContext = () => {
-  const context = useContext(ShoppingContext);
-  if (!context) {
-    throw new Error('useShoppingContext must be used within a ShoppingProvider');
-  }
-  return context;
-};
+
+
 
 const DEFAULT_SHOPPING_LIST: ShoppingItem[] = [
   { id: 1, name: "Bananer", quantity: 6, category: "Frukt", aisle: 1, checked: false, price: 25.90 },

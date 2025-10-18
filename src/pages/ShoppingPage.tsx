@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useShoppingContext } from '@/contexts/ShoppingContext';
+import { useShoppingContext } from '@/contexts/useShoppingContext';
 import FindMyIngredient from '../components/FindMyIngredient';
 
 const ShoppingPage: React.FC = () => {

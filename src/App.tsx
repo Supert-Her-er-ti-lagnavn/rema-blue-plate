@@ -15,11 +15,11 @@ import { ShoppingProvider } from "@/contexts/ShoppingContext";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [isShoppingMode, setIsShoppingMode] = useState(false);
+  const [currentMode, setCurrentMode] = useState<'planning' | 'shopping' | 'fridge'>('planning');
 
-  const handleModeToggle = (shoppingMode: boolean) => {
-    setIsShoppingMode(shoppingMode);
-    console.log(`Switched to ${shoppingMode ? 'Shopping' : 'Meal Planning'} mode`);
+  const handleModeToggle = (mode: 'planning' | 'shopping' | 'fridge') => {
+    setCurrentMode(mode);
+    console.log(`Switched to ${mode} mode`);
   };
 
   return (
