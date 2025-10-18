@@ -24,7 +24,10 @@ const AppContent: React.FC<{
   onToggle: (mode: 'planning' | 'shopping' | 'fridge') => void;
 }> = ({ currentMode, onToggle }) => {
   const location = useLocation();
-  const hideToggle = location.pathname.startsWith('/notifications') || location.pathname.startsWith('/settings');
+  const hideToggle =
+    location.pathname.startsWith('/notifications') ||
+    location.pathname.startsWith('/settings') ||
+    location.pathname.startsWith('/profile');
 
   return (
     <>
@@ -50,7 +53,7 @@ const AppContent: React.FC<{
       </Routes>
       {/* Global Chat Widget - appears on all pages */}
       <ChatWidget />
-      {/* Sticky Toggle at Bottom - appears on all pages except Notifications/Settings */}
+      {/* Sticky Toggle at Bottom - appears on all pages except Notifications/Settings/Profile */}
       {!hideToggle && <SegmentedToggle onToggle={onToggle} />}
     </>
   );
