@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ChatWidget } from "@/components/ChatWidget";
 import SegmentedToggle from "@/components/ToggleShopping";
 import { Header } from "@/components/Header";
@@ -18,6 +18,43 @@ import { FridgeMode } from '@/components/FridgeMode';
 import { NotificationProvider } from '@/contexts/NotificationContext';
 
 const queryClient = new QueryClient();
+
+const AppContent: React.FC<{
+  currentMode: 'planning' | 'shopping' | 'fridge';
+  onToggle: (mode: 'planning' | 'shopping' | 'fridge') => void;
+}> = ({ currentMode, onToggle }) => {
+  const location = useLocation();
+  const hideToggle = location.pathname.startsWith('/notifications') || location.pathname.startsWith('/settings');
+
+  return (
+    <>
+      {/* Cross-state Header - appears on all pages */}
+      <Header />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            currentMode === 'shopping' ? (
+              <ShoppingPage />
+            ) : currentMode === 'fridge' ? (
+              <FridgeMode />
+            ) : (
+              <Index currentMode={currentMode} />
+            )
+          }
+        />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/notifications" element={<Notifications />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      {/* Global Chat Widget - appears on all pages */}
+      <ChatWidget />
+      {/* Sticky Toggle at Bottom - appears on all pages except Notifications/Settings */}
+      {!hideToggle && <SegmentedToggle onToggle={onToggle} />}
+    </>
+  );
+};
 
 const App = () => {
   const [currentMode, setCurrentMode] = useState<'planning' | 'shopping' | 'fridge'>('planning');
@@ -36,30 +73,7 @@ const App = () => {
               <Toaster />
               <Sonner />
               <BrowserRouter>
-                {/* Cross-state Header - appears on all pages */}
-                <Header />
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  currentMode === 'shopping' ? (
-                    <ShoppingPage />
-                  ) : currentMode === 'fridge' ? (
-                    <FridgeMode />
-                  ) : (
-                    <Index currentMode={currentMode} />
-                  )
-                }
-              />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/notifications" element={<Notifications />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            {/* Global Chat Widget - appears on all pages */}
-            <ChatWidget />
-                {/* Sticky Toggle at Bottom - appears on all pages */}
-                <SegmentedToggle onToggle={handleModeToggle} />
+                <AppContent currentMode={currentMode} onToggle={handleModeToggle} />
               </BrowserRouter>
             </TooltipProvider>
           </NotificationProvider>
