@@ -80,18 +80,18 @@ export const MealPlanningMode: React.FC = () => {
       </div>
 
       {/* Three Column Layout: 1/6 Shopping List, 3/6 Recipes, 2/6 Chatbot */}
-      <div className="flex gap-4 p-4 h-[calc(100vh-140px)]">
+      <div className="flex gap-3 p-3 h-[calc(100vh-140px)]">
         {/* Shopping List - 1/6 */}
         <div className="flex-[1] overflow-y-auto">
           <ShoppingList />
         </div>
 
         {/* Popular Recipes - 3/6 */}
-        <div className="flex-[3] overflow-y-auto">
-          <h2 className="text-3xl font-black text-foreground mb-6 uppercase tracking-tight">
+        <div className="flex-[3] overflow-y-auto pr-2">
+          <h2 className="text-2xl font-black text-foreground mb-4 uppercase tracking-tight">
             Popular Recipes
           </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 pb-4">
             {sampleMeals.map((meal, index) => (
               <MealCard key={index} {...meal} mealIndex={index + 1} handleAddMeal={() => handleAddMeal(meal, index + 1)} />
             ))}

@@ -79,25 +79,24 @@ export const ShoppingList = () => {
   }, [halfBudgetReached, spentAmount, budgetPercentage, hasShownHalfBudgetWarning]);
 
   return (
-    <Card className="p-6 bg-card">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 rounded-full bg-primary">
-          <ShoppingCart className="w-6 h-6 text-primary-foreground" strokeWidth={2.5} />
+    <Card className="p-3 bg-card">
+      <div className="flex flex-col gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <div className="p-2 rounded-full bg-primary">
+            <ShoppingCart className="w-4 h-4 text-primary-foreground" strokeWidth={2.5} />
+          </div>
+          <h3 className="text-lg font-black text-foreground uppercase tracking-tight">Shopping</h3>
+          <Button variant="outline" size="sm" className="ml-auto text-xs px-2 py-1 h-7" onClick={clearShoppingList}>Clear</Button>
         </div>
-        <div>
-          <h3 className="text-2xl font-black text-foreground uppercase tracking-tight">Shopping List</h3>
-          <p className="text-sm text-muted-foreground font-semibold">All your groceries in one place</p>
-        </div>
-        <Button variant="outline" size="sm" className="ml-auto" onClick={clearShoppingList}>Clear</Button>
       </div>
 
       {shoppingList.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">
-          <p className="font-semibold">No items in your shopping list</p>
-          <p className="text-sm">Add meals or ingredients to get started</p>
+        <div className="text-center py-4 text-muted-foreground">
+          <p className="text-xs font-semibold">No items yet</p>
+          <p className="text-xs">Add meals to start</p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-3">
           {/* Group items by mealId and show meal name if available */}
           {Object.entries(
             shoppingList.reduce((acc, item) => {
@@ -109,23 +108,29 @@ export const ShoppingList = () => {
               return acc;
             }, {} as Record<string, typeof shoppingList>)
           ).map(([group, items]) => (
-            <div key={group} className="space-y-2">
-              <h4 className="font-black text-foreground uppercase text-sm flex items-center gap-2">
+            <div key={group} className="space-y-1">
+              <h4 className="font-black text-foreground uppercase text-xs flex items-center gap-1 truncate">
                 {group}
               </h4>
               {items.map(item => (
-                <div key={item.id} className={`flex justify-between items-center p-3 rounded-lg border group ${item.checked ? 'bg-green-100 border-green-400' : 'bg-secondary border-border'}`}>
-                  <div className="flex-1">
-                    <span className={`font-bold text-foreground ${item.checked ? 'line-through text-muted-foreground' : ''}`}>{item.name}</span>
-                    <span className="text-sm text-muted-foreground ml-2 font-semibold">x{item.quantity}</span>
-                    <span className="text-xs ml-2 text-muted-foreground">Aisle {item.aisle}</span>
+                <div key={item.id} className={`flex flex-col gap-1 p-2 rounded border group ${item.checked ? 'bg-green-100 border-green-400' : 'bg-secondary border-border'}`}>
+                  <div className="flex items-start justify-between gap-1">
+                    <div className="flex-1 min-w-0">
+                      <span className={`text-xs font-bold text-foreground block truncate ${item.checked ? 'line-through text-muted-foreground' : ''}`}>{item.name}</span>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <span className="font-semibold">x{item.quantity}</span>
+                        <span>•</span>
+                        <span className="text-xs">Aisle {item.aisle}</span>
+                      </div>
+                    </div>
+                    <span className="font-black text-primary text-xs whitespace-nowrap">{item.price} kr</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-black text-primary text-lg">{item.price} kr</span>
+                  <div className="flex items-center gap-1">
                     {!item.checked && (
                       <Button
                         variant="ghost"
-                        size="icon"
+                        size="sm"
+                        className="h-6 px-2 text-xs"
                         onClick={async () => {
                           markItemFound(item.id);
                           await recordPurchaseAndRemove(item.id);
@@ -133,16 +138,18 @@ export const ShoppingList = () => {
                         }}
                         title="Mark as found"
                       >
-                        <Check className="h-4 w-4 text-green-600" />
+                        <Check className="h-3 w-3 text-green-600 mr-1" />
+                        Done
                       </Button>
                     )}
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="sm"
+                      className="h-6 px-2 text-xs ml-auto"
                       onClick={() => removeItemFromList(item.id)}
                       title="Remove"
                     >
-                      <X className="h-4 w-4" />
+                      <X className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
@@ -152,25 +159,25 @@ export const ShoppingList = () => {
         </div>
       )}
 
-      <div className="mt-6 pt-6 border-t-2 border-primary space-y-4">
+      <div className="mt-4 pt-3 border-t border-primary space-y-3">
         {/* Budget Summary */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border-2 border-blue-200">
-          <div className="flex items-center gap-2 mb-3">
-            <Wallet className="w-5 h-5 text-blue-600" />
-            <span className="text-sm font-bold text-gray-700 uppercase">Månedsbudsjett</span>
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-2 rounded border border-blue-200">
+          <div className="flex items-center gap-1 mb-2">
+            <Wallet className="w-3 h-3 text-blue-600" />
+            <span className="text-xs font-bold text-gray-700 uppercase">Budget</span>
           </div>
           
-          <div className="space-y-2">
+          <div className="space-y-1">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Handlet</span>
-              <span className={`text-lg font-bold ${halfBudgetReached ? 'text-orange-600' : 'text-blue-600'}`}>
+              <span className="text-xs text-gray-600">Spent</span>
+              <span className={`text-sm font-bold ${halfBudgetReached ? 'text-orange-600' : 'text-blue-600'}`}>
                 {spentAmount.toFixed(0)} kr
               </span>
             </div>
             
-            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
               <div 
-                className={`h-3 rounded-full transition-all duration-500 ${
+                className={`h-2 rounded-full transition-all duration-500 ${
                   budgetPercentage >= 75 ? 'bg-red-500' : 
                   budgetPercentage >= 50 ? 'bg-orange-500' : 
                   'bg-green-500'
@@ -180,16 +187,16 @@ export const ShoppingList = () => {
             </div>
             
             <div className="flex justify-between items-center text-xs text-gray-600">
-              <span>0 kr</span>
+              <span>0</span>
               <span className="font-semibold">{budgetPercentage.toFixed(0)}%</span>
-              <span>{monthlyBudget} kr</span>
+              <span>{monthlyBudget}</span>
             </div>
 
             {halfBudgetReached && (
-              <div className="flex items-center gap-2 mt-2 p-2 bg-orange-100 rounded border border-orange-300">
-                <AlertTriangle className="w-4 h-4 text-orange-600" />
+              <div className="flex items-center gap-1 mt-1 p-1 bg-orange-100 rounded border border-orange-300">
+                <AlertTriangle className="w-3 h-3 text-orange-600 flex-shrink-0" />
                 <span className="text-xs text-orange-800 font-semibold">
-                  Du har brukt over halvparten av budsjettet ditt
+                  Over 50% used
                 </span>
               </div>
             )}
@@ -198,11 +205,11 @@ export const ShoppingList = () => {
 
         {/* Total Cost */}
         <div className="flex justify-between items-center">
-          <span className="text-lg font-black text-foreground uppercase">Total Cost</span>
-          <span className="text-3xl font-black text-primary">{totalCost.toFixed(2)} kr</span>
+          <span className="text-sm font-black text-foreground uppercase">Total</span>
+          <span className="text-xl font-black text-primary">{totalCost.toFixed(0)} kr</span>
         </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-muted-foreground">Items found: {getCompletedCount()} / {getTotalCount()}</span>
+        <div className="text-xs text-muted-foreground text-center">
+          Found: {getCompletedCount()} / {getTotalCount()}
         </div>
       </div>
     </Card>

@@ -190,36 +190,36 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize, inline 
   return (
     <div className={inline ? "h-full bg-card rounded-lg shadow-lg border border-border flex flex-col" : "fixed bottom-4 right-4 z-50 w-96 h-[500px] bg-card rounded-lg shadow-2xl border border-border flex flex-col"}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-4 rounded-t-lg flex items-center justify-between">
+      <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-2 rounded-t-lg flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Bot className="w-5 h-5" />
-          <h3 className="font-semibold">🍳 Recipe Assistant</h3>
+          <Bot className="w-4 h-4" />
+          <h3 className="font-semibold text-sm">🍳 Recipe Assistant</h3>
         </div>
         {onToggleMinimize && (
           <button
             onClick={onToggleMinimize}
             className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
           >
-            <MessageCircle className="w-4 h-4" />
+            <MessageCircle className="w-3 h-3" />
           </button>
         )}
       </div>
 
       {/* Token Input (if needed) */}
       {!hfToken && (
-        <div className="p-3 bg-yellow-50 border-b border-yellow-200">
-          <div className="flex gap-2 items-center">
+        <div className="p-2 bg-yellow-50 border-b border-yellow-200">
+          <div className="flex flex-col gap-1">
             <input
               type="password"
-              placeholder="Enter HuggingFace token..."
+              placeholder="HuggingFace token..."
               onChange={(e: ChangeEvent<HTMLInputElement>) => saveToken(e.target.value)}
-              className="flex-1 px-2 py-1 text-sm border border-yellow-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-2 py-1 text-xs border border-yellow-300 rounded focus:outline-none focus:ring-2 focus:ring-ring"
             />
             <a 
               href="https://huggingface.co/settings/tokens" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-xs text-blue-600 hover:text-blue-800"
+              className="text-xs text-blue-600 hover:text-blue-800 text-center"
             >
               Get Token
             </a>
@@ -228,34 +228,34 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize, inline 
       )}
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/30">
+      <div className="flex-1 overflow-y-auto p-2 space-y-2 bg-muted/30">
         {messages.length === 0 ? (
-          <div className="text-center text-muted-foreground mt-8">
-            <Bot className="w-8 h-8 mx-auto mb-2 text-muted-foreground/60" />
-            <p className="text-sm">Ask me about recipes, ingredients, or cooking tips!</p>
+          <div className="text-center text-muted-foreground mt-4">
+            <Bot className="w-6 h-6 mx-auto mb-1 text-muted-foreground/60" />
+            <p className="text-xs">Ask about recipes or ingredients!</p>
           </div>
         ) : (
           messages.map((message: Message) => (
             <div
               key={message.id}
-              className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex gap-1 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className={`max-w-[80%] rounded-lg p-3 ${
+              <div className={`max-w-[85%] rounded p-2 ${
                 message.role === 'user'
                   ? 'bg-primary text-primary-foreground ml-auto'
                   : 'bg-card border border-border'
               }`}>
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-1 mb-1">
                   {message.role === 'user' ? (
-                    <User className="w-3 h-3" />
+                    <User className="w-2 h-2" />
                   ) : (
-                    <Bot className="w-3 h-3" />
+                    <Bot className="w-2 h-2" />
                   )}
                   <span className="text-xs font-medium opacity-75">
-                    {message.role === 'user' ? 'You' : 'Assistant'}
+                    {message.role === 'user' ? 'You' : 'AI'}
                   </span>
                 </div>
-                <div className="text-sm whitespace-pre-wrap">
+                <div className="text-xs whitespace-pre-wrap break-words">
                   {message.content}
                 </div>
               </div>
@@ -265,26 +265,26 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize, inline 
         
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-card border border-border rounded-lg p-3 max-w-[80%]">
-              <div className="flex items-center gap-2">
+            <div className="bg-card border border-border rounded p-2 max-w-[85%]">
+              <div className="flex items-center gap-1">
                 <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
                 </div>
-                <span className="text-sm text-muted-foreground">Assistant is thinking...</span>
+                <span className="text-xs text-muted-foreground">Thinking...</span>
               </div>
             </div>
           </div>
         )}
         {/* If a meal is suggested, show confirm button */}
         {suggestedMeal && (
-          <div className="flex justify-center mt-2">
+          <div className="flex justify-center mt-1">
             <button
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
+              className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded shadow text-xs"
               onClick={handleAddMealToShoppingList}
             >
-              Legg til ingredienser fra "{suggestedMeal.title}" i handlelisten
+              Add "{suggestedMeal.title}" to list
             </button>
           </div>
         )}
@@ -293,8 +293,8 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize, inline 
       </div>
 
       {/* Input Form */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-border bg-card rounded-b-lg">
-        <div className="flex gap-2 items-end">
+      <form onSubmit={handleSubmit} className="p-2 border-t border-border bg-card rounded-b-lg">
+        <div className="flex gap-1 items-end">
           <textarea
             value={input}
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
@@ -304,25 +304,25 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize, inline 
                 handleSubmit(e);
               }
             }}
-            placeholder={hfToken ? "Ask about recipes, ingredients..." : "Enter token above first"}
+            placeholder={hfToken ? "Ask about recipes..." : "Enter token first"}
             disabled={!hfToken || isLoading}
             rows={1}
-            className="flex-1 px-3 py-2 border border-input rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent text-sm bg-background"
+            className="flex-1 px-2 py-1 border border-input rounded resize-none focus:outline-none focus:ring-1 focus:ring-ring focus:border-transparent text-xs bg-background"
           />
           <button
             type="submit"
             disabled={!input.trim() || !hfToken || isLoading}
-            className="bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground text-primary-foreground p-2 rounded-lg transition-colors"
+            className="bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground text-primary-foreground p-1.5 rounded transition-colors"
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-3 h-3" />
           </button>
           {messages.length > 0 && (
             <button
               type="button"
               onClick={clearChat}
-              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground p-2 rounded-lg transition-colors"
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground p-1.5 rounded transition-colors"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3 h-3" />
             </button>
           )}
         </div>
