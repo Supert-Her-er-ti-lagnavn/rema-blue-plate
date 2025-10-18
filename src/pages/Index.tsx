@@ -1,12 +1,23 @@
+import { useState } from "react";
 import { Hero } from "@/components/Hero";
 import { MealCard } from "@/components/MealCard";
 import { WeeklyPlanner } from "@/components/WeeklyPlanner";
 import { ShoppingList } from "@/components/ShoppingList";
 
-const zeroSampleMeals = [
+interface Meal {
+  title: string;
+  image: string;
+  prepTime: number;
+  servings: number;
+  totalCost: number;
+  ingredients: Array<{
+    name: string;
+    amount: string;
+    price: number;
+  }>;
+}
 
-];  
-const sampleMeals = [
+const sampleMeals: Meal[] = [
   {
     title: "Chicken Tikka Masala",
     image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80",
@@ -49,20 +60,26 @@ const sampleMeals = [
 ];
 
 const Index = () => {
+  const [addedMeals, setAddedMeals] = useState<Meal[]>([]);
+
+  const handleAddMeal = (meal: Meal) => {
+    setAddedMeals([...addedMeals, meal]);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Hero />
       
       <div className="max-w-7xl mx-auto px-4 py-16 space-y-16">
         <section>
-          <ShoppingList meals={zeroSampleMeals} />
+          <ShoppingList meals={addedMeals} />
         </section>
 
         <section>
           <h2 className="text-3xl font-black text-foreground mb-8 uppercase tracking-tight">Popular Recipes</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sampleMeals.map((meal, index) => (
-              <MealCard key={index} {...meal} />
+              <MealCard key={index} {...meal} onAddMeal={() => handleAddMeal(meal)} />
             ))}
           </div>
         </section>
