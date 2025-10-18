@@ -187,7 +187,7 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: Huggi
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-96 h-[500px] bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col">
+    <div className={`${onToggleMinimize ? 'fixed bottom-4 right-4 z-50 w-96 h-[500px]' : 'w-full h-full'} bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col`}
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-t-lg flex items-center justify-between">
         <div className="flex items-center gap-2">
