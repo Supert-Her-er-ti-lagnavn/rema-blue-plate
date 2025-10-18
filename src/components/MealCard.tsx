@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, Users, Plus } from "lucide-react";
+import { Clock, Users, Plus, Check } from "lucide-react";
 import { useShoppingContext } from "@/contexts/useShoppingContext";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -30,6 +30,7 @@ export const MealCard = ({ title, image, prepTime, servings, ingredients, totalC
   const { addItemsToShoppingList } = useShoppingContext();
   const { showFridgeNotification } = useNotification();
   const [isAdding, setIsAdding] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
 
   // Use custom handler if provided (for fridge logic), else fallback to default
   const onAdd = handleAddMeal || (() => {
@@ -52,6 +53,8 @@ export const MealCard = ({ title, image, prepTime, servings, ingredients, totalC
 
     setTimeout(() => {
       setIsAdding(false);
+      setJustAdded(true);
+      setTimeout(() => setJustAdded(false), 1000);
     }, 300);
   });
 
@@ -99,13 +102,26 @@ export const MealCard = ({ title, image, prepTime, servings, ingredients, totalC
         </div>
 
         <Button 
-          className={`w-full gap-2 font-bold uppercase text-sm transition-all ${isAdding ? 'animate-scale-in' : ''}`}
+          className={`w-full gap-2 font-bold uppercase text-sm transition-all duration-300 ${
+            isAdding ? 'animate-pulse scale-95' : ''
+          } ${
+            justAdded ? 'animate-scale-in bg-green-600 hover:bg-green-600' : ''
+          }`}
           variant="default"
           onClick={onAdd}
           disabled={isAdding}
         >
-          <Plus className="w-4 h-4" />
-          {isAdding ? 'Legger til...' : 'Legg til i handlelisten'}
+          {justAdded ? (
+            <>
+              <Check className="w-4 h-4" />
+              Lagt til!
+            </>
+          ) : (
+            <>
+              <Plus className="w-4 h-4" />
+              {isAdding ? 'Legger til...' : 'Legg til i handlelisten'}
+            </>
+          )}
         </Button>
       </div>
     </Card>
