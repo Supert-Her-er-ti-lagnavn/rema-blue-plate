@@ -22,20 +22,21 @@ const FindMyIngredient: React.FC = () => {
   const totalCount = getTotalCount();
   const progressPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
-  // Spent amount from backend monthly purchases
-  const [spentAmount, setSpentAmount] = useState(0);
+  // Spent amount stored in localStorage
+  const [spentAmount, setSpentAmount] = useState(() => {
+    const saved = localStorage.getItem('monthlySpent');
+    return saved ? parseFloat(saved) : 0;
+  });
 
-  const refreshMonthlySpent = async () => {
-    try {
-      const res = await apiService.getCurrentMonthPurchases();
-      setSpentAmount(res.total_spent || 0);
-    } catch (e) {
-      // ignore backend errors for UI
-    }
+  const refreshMonthlySpent = () => {
+    const saved = localStorage.getItem('monthlySpent');
+    setSpentAmount(saved ? parseFloat(saved) : 0);
   };
 
   useEffect(() => {
-    refreshMonthlySpent();
+    const handleStorageChange = () => refreshMonthlySpent();
+    window.addEventListener('monthlySpentUpdated', handleStorageChange);
+    return () => window.removeEventListener('monthlySpentUpdated', handleStorageChange);
   }, []);
 
   const budgetPercentage = (spentAmount / monthlyBudget) * 100;
