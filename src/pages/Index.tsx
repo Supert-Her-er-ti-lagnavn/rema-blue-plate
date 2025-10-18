@@ -154,6 +154,11 @@ const Index = () => {
     setAddedMeals(updatedMeals);
   };
 
+  const handleRemoveMeal = (mealIndex: number) => {
+    const updatedMeals = addedMeals.filter((_, index) => index !== mealIndex);
+    setAddedMeals(updatedMeals);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Hero />
@@ -164,16 +169,16 @@ const Index = () => {
         </section>
 
         <section>
+          <WeeklyPlanner meals={addedMeals} onRemoveMeal={handleRemoveMeal} />
+        </section>
+
+        <section>
           <h2 className="text-3xl font-black text-foreground mb-8 uppercase tracking-tight">Popular Recipes</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sampleMeals.map((meal, index) => (
               <MealCard key={index} {...meal} onAddMeal={() => handleAddMeal(meal)} />
             ))}
           </div>
-        </section>
-
-        <section>
-          <WeeklyPlanner />
         </section>
       </div>
     </div>
