@@ -79,11 +79,11 @@ export const MealPlanningMode: React.FC = () => {
         </p>
       </div>
 
-      {/* Three Column Layout: 1/6 Shopping List, 3/6 Recipes, 2/6 Chatbot */}
+      {/* Three Column Layout: 1/6 Chatbot, 3/6 Recipes, 2/6 Shopping List */}
       <div className="flex gap-3 p-3 h-[calc(100vh-140px)]">
-        {/* Shopping List - 1/6 */}
-        <div className="flex-[1] overflow-y-auto">
-          <ShoppingList />
+        {/* Chatbot - 1/6 */}
+        <div className="flex-[1]">
+          <HuggingFaceChat isMinimized={false} inline={true} />
         </div>
 
         {/* Popular Recipes - 3/6 */}
@@ -98,9 +98,9 @@ export const MealPlanningMode: React.FC = () => {
           </div>
         </div>
 
-        {/* Chatbot - 2/6 */}
-        <div className="flex-[2]">
-          <HuggingFaceChat isMinimized={false} inline={true} />
+        {/* Shopping List - 2/6 */}
+        <div className="flex-[2] overflow-y-auto">
+          <ShoppingList />
         </div>
       </div>
     </div>
