@@ -9,9 +9,9 @@ export function ChatWidget() {
   };
 
   return (
-    <HuggingFaceChat 
-      isMinimized={isMinimized} 
-      onToggleMinimize={toggleMinimize} 
-    />
+      <HuggingFaceChat
+        isMinimized={isMinimized}
+        onToggleMinimize={toggleMinimize}
+      />
   );
 }

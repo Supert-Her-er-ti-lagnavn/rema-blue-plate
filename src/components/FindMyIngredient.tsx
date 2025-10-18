@@ -1,15 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useShoppingContext } from '@/contexts/useShoppingContext';
+import { Wallet } from 'lucide-react';
+import { toast } from 'sonner';
 
 const FindMyIngredient: React.FC = () => {
-  const { getCurrentItem, markItemFound, getCompletedCount, getTotalCount } = useShoppingContext();
+  const { getCurrentItem, markItemFound, getCompletedCount, getTotalCount, shoppingList, recordPurchaseAndRemove } = useShoppingContext();
   const [userPosition, setUserPosition] = useState({ x: 450, y: 600 });
   const [pulseAnimation, setPulseAnimation] = useState(false);
+  const [monthlyBudget, setMonthlyBudget] = useState(5000);
+
+  useEffect(() => {
+    const savedProfile = localStorage.getItem('userProfile');
+    if (savedProfile) {
+      const profile = JSON.parse(savedProfile);
+      setMonthlyBudget(profile.monthlyBudget || 5000);
+    }
+  }, []);
 
   const currentItem = getCurrentItem();
   const completedCount = getCompletedCount();
   const totalCount = getTotalCount();
   const progressPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+
+  // Spent amount stored in localStorage
+  const [spentAmount, setSpentAmount] = useState(() => {
+    const saved = localStorage.getItem('monthlySpent');
+    return saved ? parseFloat(saved) : 0;
+  });
+
+  const refreshMonthlySpent = () => {
+    const saved = localStorage.getItem('monthlySpent');
+    setSpentAmount(saved ? parseFloat(saved) : 0);
+  };
+
+  useEffect(() => {
+    const handleStorageChange = () => refreshMonthlySpent();
+    window.addEventListener('monthlySpentUpdated', handleStorageChange);
+    return () => window.removeEventListener('monthlySpentUpdated', handleStorageChange);
+  }, []);
+
+  const budgetPercentage = (spentAmount / monthlyBudget) * 100;
 
   // Dummy direction and distance logic (replace with real logic if needed)
   const getDirectionData = () => {
@@ -45,6 +75,34 @@ const FindMyIngredient: React.FC = () => {
           <div 
             className="bg-blue-600 h-2 rounded-full transition-all duration-300"
             style={{ width: `${progressPercentage}%` }}
+          ></div>
+        </div>
+      </div>
+
+      {/* Budget indicator */}
+      <div className="mb-6 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Wallet className="w-4 h-4 text-blue-600" />
+            <span className="text-xs font-semibold text-gray-700">Budsjett</span>
+          </div>
+          <div className="text-right">
+            <div className="text-sm font-bold text-blue-600">
+              {spentAmount.toFixed(0)} / {monthlyBudget} kr
+            </div>
+            <div className="text-xs text-gray-600">
+              {budgetPercentage.toFixed(0)}%
+            </div>
+          </div>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+          <div 
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              budgetPercentage >= 75 ? 'bg-red-500' : 
+              budgetPercentage >= 50 ? 'bg-orange-500' : 
+              'bg-green-500'
+            }`}
+            style={{ width: `${Math.min(budgetPercentage, 100)}%` }}
           ></div>
         </div>
       </div>
@@ -86,10 +144,12 @@ const FindMyIngredient: React.FC = () => {
         {/* Action Buttons */}
         <div className="space-y-3">
           <button
-            onClick={() => {
+            onClick={async () => {
               setPulseAnimation(true);
               setTimeout(() => setPulseAnimation(false), 1000);
               markItemFound(currentItem.id);
+              await recordPurchaseAndRemove(currentItem.id);
+              toast.success(`✓ ${currentItem.name} lagt til budsjettet (${currentItem.price} kr)`);
             }}
             className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors"
           >

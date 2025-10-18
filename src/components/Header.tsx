@@ -1,21 +1,72 @@
-import React from 'react';
-import { Bell, User } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bell, Leaf, User, UserCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { usePreferences } from '@/contexts/PreferencesContext';
+import { Badge } from '@/components/ui/badge';
 
 export const Header: React.FC = () => {
+  const navigate = useNavigate();
+  const { dietaryPreference, setDietaryPreference } = usePreferences();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadProfilePicture = () => {
+      const savedProfile = localStorage.getItem('userProfile');
+      if (savedProfile) {
+        const profile = JSON.parse(savedProfile);
+        setProfilePicture(profile.profilePicture || null);
+      }
+    };
+
+    loadProfilePicture();
+    window.addEventListener('storage', loadProfilePicture);
+    window.addEventListener('profileUpdated', loadProfilePicture);
+    return () => {
+      window.removeEventListener('storage', loadProfilePicture);
+      window.removeEventListener('profileUpdated', loadProfilePicture);
+    };
+  }, []);
+
+  const labelMap: Record<typeof dietaryPreference, string> = {
+    omnivore: 'Omnivore',
+    vegetarian: 'Vegetarian',
+    vegan: 'Vegan',
+    eco: 'Eco',
+  };
+
+  const badgeVariant =
+    dietaryPreference === 'vegan'
+      ? 'destructive'
+      : dietaryPreference === 'vegetarian'
+      ? 'secondary'
+      : dietaryPreference === 'eco'
+      ? 'outline'
+      : 'default';
+
   return (
     <header className="w-full bg-gradient-to-r from-blue-600 to-blue-700 shadow-lg sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         
         {/* Left side - Profile and Notifications */}
-        <div className="flex items-center gap-3">
-          <button 
-            className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105"
+        <div className="flex items-center gap-3 relative">
+          <button
+            onClick={() => navigate('/profile')}
+            className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 overflow-hidden"
             aria-label="Profile"
           >
-            <User size={20} />
+            {profilePicture ? (
+              <img src={profilePicture} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <User size={20} />
+            )}
           </button>
+          <Badge variant={badgeVariant as any} className="hidden sm:flex items-center gap-1 bg-white/10 text-white border-white/30">
+            <Leaf size={12} /> {labelMap[dietaryPreference]}
+          </Badge>
           
           <button 
+            onClick={() => navigate('/notifications')}
             className="relative w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105"
             aria-label="Notifications"
           >

@@ -82,6 +82,18 @@ class ApiService {
     });
   }
 
+  // Purchases API
+  async recordPurchase(item: PurchasedItem): Promise<{ message: string; count_this_month: number }> {
+    return this.fetchApi('/shopping/purchases', {
+      method: 'POST',
+      body: JSON.stringify(item),
+    });
+  }
+
+  async getCurrentMonthPurchases(): Promise<{ items: PurchasedItem[]; total_spent: number }> {
+    return this.fetchApi('/shopping/purchases/current-month');
+  }
+
   // Users API
   async getCurrentUser(): Promise<User> {
     return this.fetchApi('/users/me');
@@ -208,4 +220,15 @@ export interface FindMyIngredientResponse {
   completed_items: number;
   total_items: number;
   progress_percentage: number;
+}
+
+export interface PurchasedItem {
+  id: number;
+  name: string;
+  quantity: number;
+  category: string;
+  aisle: number;
+  price: number;
+  mealId?: number;
+  purchased_at?: string;
 }

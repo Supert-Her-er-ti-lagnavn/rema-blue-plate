@@ -3,6 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, Users, Plus } from "lucide-react";
 import { useShoppingContext } from "@/contexts/useShoppingContext";
+import { toast } from "sonner";
+import { useState } from "react";
+import { useNotification } from "@/contexts/NotificationContext";
 
 interface Ingredient {
   name: string;
@@ -25,12 +28,16 @@ interface MealCardProps {
 
 export const MealCard = ({ title, image, prepTime, servings, ingredients, totalCost, mealIndex, handleAddMeal }: MealCardProps) => {
   const { addItemsToShoppingList } = useShoppingContext();
+  const { showFridgeNotification } = useNotification();
+  const [isAdding, setIsAdding] = useState(false);
 
   // Use custom handler if provided (for fridge logic), else fallback to default
   const onAdd = handleAddMeal || (() => {
+    setIsAdding(true);
+    
     addItemsToShoppingList(
       ingredients.map((ing, i) => ({
-        id: Number(`${mealIndex || 0}${i + 1}${ing.name.length}${title.length}`),
+        id: Number(`${mealIndex || 0}${i + 1}${ing.name.length}${title.length}${Date.now()}`),
         name: ing.name,
         quantity: parseInt(ing.amount) || 1,
         category: "",
@@ -40,6 +47,12 @@ export const MealCard = ({ title, image, prepTime, servings, ingredients, totalC
         mealId: mealIndex || 0,
       }))
     );
+
+    showFridgeNotification();
+
+    setTimeout(() => {
+      setIsAdding(false);
+    }, 300);
   });
 
   return (
@@ -86,12 +99,13 @@ export const MealCard = ({ title, image, prepTime, servings, ingredients, totalC
         </div>
 
         <Button 
-          className="w-full gap-2 font-bold uppercase text-sm" 
+          className={`w-full gap-2 font-bold uppercase text-sm transition-all ${isAdding ? 'animate-scale-in' : ''}`}
           variant="default"
           onClick={onAdd}
+          disabled={isAdding}
         >
           <Plus className="w-4 h-4" />
-          Add to Meal Plan
+          {isAdding ? 'Legger til...' : 'Legg til i handlelisten'}
         </Button>
       </div>
     </Card>
