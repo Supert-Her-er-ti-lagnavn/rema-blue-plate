@@ -143,17 +143,28 @@ export const MealPlanningMode: React.FC = () => {
     const fridgeItems = JSON.parse(localStorage.getItem('fridgeItems') || '[]');
     const fridgeItemNames = fridgeItems.map((item: any) => item.name.toLowerCase());
     
-    // Filter out ingredients that are already in the fridge
-    const neededIngredients = meal.ingredients.filter(
-      (ingredient) => !fridgeItemNames.includes(ingredient.name.toLowerCase())
-    );
+    // Track which ingredients are used from fridge
+    const usedFromFridge: string[] = [];
     
-    // If all ingredients are in the fridge, don't add to shopping list
-    if (neededIngredients.length === 0) {
-      setAddedMeals([...addedMeals, { ...meal, ingredients: [] }]);
-    } else {
-      setAddedMeals([...addedMeals, { ...meal, ingredients: neededIngredients }]);
+    // Filter out ingredients that are already in the fridge
+    const neededIngredients = meal.ingredients.filter((ingredient) => {
+      const isInFridge = fridgeItemNames.includes(ingredient.name.toLowerCase());
+      if (isInFridge) {
+        usedFromFridge.push(ingredient.name.toLowerCase());
+      }
+      return !isInFridge;
+    });
+    
+    // Remove used ingredients from fridge
+    if (usedFromFridge.length > 0) {
+      const updatedFridge = fridgeItems.filter(
+        (item: any) => !usedFromFridge.includes(item.name.toLowerCase())
+      );
+      localStorage.setItem('fridgeItems', JSON.stringify(updatedFridge));
     }
+    
+    // Add meal with only needed ingredients
+    setAddedMeals([...addedMeals, { ...meal, ingredients: neededIngredients }]);
   };
 
   const handleRemoveIngredient = (ingredientName: string) => {
