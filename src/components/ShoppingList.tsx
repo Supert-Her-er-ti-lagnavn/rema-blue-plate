@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Ingredient {
   name: string;
@@ -11,9 +12,10 @@ interface ShoppingListProps {
   meals: Array<{
     ingredients: Ingredient[];
   }>;
+  onRemoveIngredient?: (ingredientName: string) => void;
 }
 
-export const ShoppingList = ({ meals }: ShoppingListProps) => {
+export const ShoppingList = ({ meals, onRemoveIngredient }: ShoppingListProps) => {
   // Consolidate all ingredients
   const allIngredients = meals.flatMap(meal => meal.ingredients);
   
@@ -46,13 +48,25 @@ export const ShoppingList = ({ meals }: ShoppingListProps) => {
         {consolidatedIngredients.map((ingredient, index) => (
           <div 
             key={index} 
-            className="flex justify-between items-center p-3 rounded-lg bg-secondary border border-border"
+            className="flex justify-between items-center p-3 rounded-lg bg-secondary border border-border group"
           >
-            <div>
+            <div className="flex-1">
               <span className="font-bold text-foreground">{ingredient.name}</span>
               <span className="text-sm text-muted-foreground ml-2 font-semibold">({ingredient.amount})</span>
             </div>
-            <span className="font-black text-primary text-lg">{ingredient.price} kr</span>
+            <div className="flex items-center gap-3">
+              <span className="font-black text-primary text-lg">{ingredient.price} kr</span>
+              {onRemoveIngredient && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => onRemoveIngredient(ingredient.name)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         ))}
       </div>

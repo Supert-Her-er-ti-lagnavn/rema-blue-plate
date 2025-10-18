@@ -19,42 +19,120 @@ interface Meal {
 
 const sampleMeals: Meal[] = [
   {
-    title: "Chicken Tikka Masala",
-    image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80",
-    prepTime: 45,
+    title: "Pasta Alfredo med Kylling",
+    image: "https://www.rema.no/acd-cgi/img/v1/wordpress/wp-content/uploads/2025/10/IMG_3833-1-1920x1080.jpg?width=660",
+    prepTime: 35,
     servings: 4,
-    totalCost: 89,
+    totalCost: 95,
     ingredients: [
-      { name: "Chicken breast", amount: "500g", price: 45 },
-      { name: "Tikka masala sauce", amount: "1 jar", price: 25 },
-      { name: "Rice", amount: "300g", price: 12 },
-      { name: "Naan bread", amount: "4 pcs", price: 7 },
+      { name: "Kyllingfilet", amount: "500g", price: 55 },
+      { name: "Pasta", amount: "400g", price: 15 },
+      { name: "Fløte", amount: "3 dl", price: 18 },
+      { name: "Parmesan", amount: "100g", price: 7 },
     ],
   },
   {
-    title: "Spaghetti Carbonara",
-    image: "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=800&q=80",
-    prepTime: 25,
+    title: "Marry Me Chicken",
+    image: "https://www.rema.no/acd-cgi/img/v1/wordpress/wp-content/uploads/2025/03/REMA1000-SP8-9-Merry-me-chicken-B-e1754460393872-1920x1080.jpg?width=660",
+    prepTime: 45,
+    servings: 4,
+    totalCost: 110,
+    ingredients: [
+      { name: "Kyllingfilet", amount: "600g", price: 65 },
+      { name: "Soltørkede tomater", amount: "100g", price: 22 },
+      { name: "Fløte", amount: "3 dl", price: 18 },
+      { name: "Hvitløk", amount: "3 fedd", price: 5 },
+    ],
+  },
+  {
+    title: "Tacosuppe",
+    image: "https://www.rema.no/acd-cgi/img/v1/wordpress/wp-content/uploads/2024/10/IMG_1757-1-1920x1080.jpg?width=660",
+    prepTime: 30,
+    servings: 4,
+    totalCost: 85,
+    ingredients: [
+      { name: "Kjøttdeig", amount: "500g", price: 45 },
+      { name: "Taco krydder", amount: "1 pk", price: 12 },
+      { name: "Tomater på boks", amount: "400g", price: 15 },
+      { name: "Mais", amount: "1 boks", price: 13 },
+    ],
+  },
+  {
+    title: "Kylling med Pesto og Ris",
+    image: "https://www.rema.no/acd-cgi/img/v1/wordpress/wp-content/uploads/2025/08/Bilde-3305-1-1920x1080.jpg?width=660",
+    prepTime: 90,
+    servings: 4,
+    totalCost: 105,
+    ingredients: [
+      { name: "Kyllinglår", amount: "800g", price: 60 },
+      { name: "Pesto", amount: "1 glass", price: 28 },
+      { name: "Ris", amount: "300g", price: 12 },
+      { name: "Grønnsaker", amount: "400g", price: 5 },
+    ],
+  },
+  {
+    title: "Kebab i Langpanne",
+    image: "https://www.rema.no/acd-cgi/img/v1/wordpress/wp-content/uploads/2025/08/Bilde-3247-1-1920x1080.jpg?width=660",
+    prepTime: 30,
+    servings: 4,
+    totalCost: 92,
+    ingredients: [
+      { name: "Kjøttdeig", amount: "600g", price: 54 },
+      { name: "Kebabkrydder", amount: "1 pk", price: 15 },
+      { name: "Paprika", amount: "2 stk", price: 18 },
+      { name: "Hvitløk", amount: "3 fedd", price: 5 },
+    ],
+  },
+  {
+    title: "Ovnsbakt Gyoza i Red Curry",
+    image: "https://www.rema.no/acd-cgi/img/v1/wordpress/wp-content/uploads/2025/09/Bilde-3771-1-1920x1080.jpg?width=660",
+    prepTime: 35,
+    servings: 4,
+    totalCost: 78,
+    ingredients: [
+      { name: "Gyoza", amount: "1 pk", price: 45 },
+      { name: "Red curry paste", amount: "2 ss", price: 8 },
+      { name: "Kokosmelk", amount: "400ml", price: 20 },
+      { name: "Grønnsaker", amount: "200g", price: 5 },
+    ],
+  },
+  {
+    title: "BBQ Chicken Tenders",
+    image: "https://www.rema.no/acd-cgi/img/v1/wordpress/wp-content/uploads/2025/03/IMG-4159-fra-Google-Disk-1-1-e1742285896240-1920x1080.jpg?width=660",
+    prepTime: 45,
+    servings: 4,
+    totalCost: 88,
+    ingredients: [
+      { name: "Kyllingfilet", amount: "600g", price: 65 },
+      { name: "BBQ saus", amount: "200ml", price: 18 },
+      { name: "Mel", amount: "2 dl", price: 3 },
+      { name: "Egg", amount: "2 stk", price: 2 },
+    ],
+  },
+  {
+    title: "Shakshuka",
+    image: "https://www.rema.no/acd-cgi/img/v1/wordpress/wp-content/uploads/2024/04/IMG_1181.jpg?width=660",
+    prepTime: 20,
     servings: 4,
     totalCost: 65,
     ingredients: [
-      { name: "Spaghetti", amount: "400g", price: 15 },
-      { name: "Bacon", amount: "200g", price: 28 },
-      { name: "Eggs", amount: "4 pcs", price: 12 },
-      { name: "Parmesan", amount: "100g", price: 10 },
+      { name: "Egg", amount: "6 stk", price: 18 },
+      { name: "Tomater", amount: "400g", price: 25 },
+      { name: "Paprika", amount: "2 stk", price: 18 },
+      { name: "Løk", amount: "1 stk", price: 4 },
     ],
   },
   {
-    title: "Salmon with Vegetables",
-    image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&q=80",
-    prepTime: 30,
+    title: "Blomkålbiff",
+    image: "https://www.rema.no/acd-cgi/img/v1/wordpress/wp-content/uploads/2024/09/IMG_1815-1-1920x1080.jpg?width=660",
+    prepTime: 20,
     servings: 4,
-    totalCost: 125,
+    totalCost: 55,
     ingredients: [
-      { name: "Salmon fillets", amount: "600g", price: 85 },
-      { name: "Broccoli", amount: "400g", price: 18 },
-      { name: "Potatoes", amount: "500g", price: 15 },
-      { name: "Lemon", amount: "2 pcs", price: 7 },
+      { name: "Blomkål", amount: "1 stk", price: 35 },
+      { name: "Olje", amount: "3 ss", price: 5 },
+      { name: "Krydder", amount: "1 pk", price: 12 },
+      { name: "Sitron", amount: "1 stk", price: 3 },
     ],
   },
 ];
@@ -66,13 +144,23 @@ const Index = () => {
     setAddedMeals([...addedMeals, meal]);
   };
 
+  const handleRemoveIngredient = (ingredientName: string) => {
+    // Remove all instances of this ingredient from all meals
+    const updatedMeals = addedMeals.map(meal => ({
+      ...meal,
+      ingredients: meal.ingredients.filter(ing => ing.name !== ingredientName)
+    })).filter(meal => meal.ingredients.length > 0); // Remove meals with no ingredients
+    
+    setAddedMeals(updatedMeals);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Hero />
       
       <div className="max-w-7xl mx-auto px-4 py-16 space-y-16">
         <section>
-          <ShoppingList meals={addedMeals} />
+          <ShoppingList meals={addedMeals} onRemoveIngredient={handleRemoveIngredient} />
         </section>
 
         <section>
