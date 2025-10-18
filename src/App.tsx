@@ -10,6 +10,7 @@ import { Header } from "@/components/Header";
 import Index from "./pages/Index";
 import ShoppingPage from "./pages/ShoppingPage";
 import Profile from "./pages/Profile";
+import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 import { ShoppingProvider } from "@/contexts/ShoppingContext";
 import { PreferencesProvider } from "@/contexts/PreferencesContext";
@@ -49,6 +50,7 @@ const App = () => {
                 }
               />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/notifications" element={<Notifications />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

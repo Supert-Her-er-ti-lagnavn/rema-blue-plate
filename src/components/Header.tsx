@@ -43,6 +43,7 @@ export const Header: React.FC = () => {
           </Badge>
           
           <button 
+            onClick={() => navigate('/notifications')}
             className="relative w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105"
             aria-label="Notifications"
           >
