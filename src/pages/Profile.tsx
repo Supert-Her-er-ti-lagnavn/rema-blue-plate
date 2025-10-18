@@ -37,6 +37,7 @@ const Profile: React.FC = () => {
 
   const handleSave = () => {
     localStorage.setItem('userProfile', JSON.stringify(profile));
+    window.dispatchEvent(new Event('profileUpdated'));
     toast.success('Profil lagret!');
   };
 
