@@ -66,10 +66,8 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const addItemsToShoppingList = (items: ShoppingItem[]) => {
     setShoppingList(currentList => {
-      const newItems = items.filter(item => 
-        !currentList.some(existing => existing.id === item.id)
-      );
-      return [...currentList, ...newItems].sort((a, b) => a.aisle - b.aisle);
+      // Always add items (allow duplicates) since they have unique IDs
+      return [...currentList, ...items].sort((a, b) => a.aisle - b.aisle);
     });
   };
 

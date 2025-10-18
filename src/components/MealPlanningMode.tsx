@@ -1,5 +1,5 @@
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { MealCard } from "@/components/MealCard";
 import { ShoppingList } from "@/components/ShoppingList";
 import { useShoppingContext } from "@/contexts/useShoppingContext";
@@ -19,19 +19,7 @@ export interface Meal {
 }
 
 export const MealPlanningMode: React.FC = () => {
-  const { addItemsToShoppingList, shoppingList } = useShoppingContext();
-
-  // Filter out meals where all items have been shopped (checked or removed)
-  const availableMeals = useMemo(() => {
-    return sampleMeals.filter((meal, index) => {
-      const mealId = index + 1;
-      const mealItems = shoppingList.filter(item => item.mealId === mealId);
-      // If no items in shopping list, meal is available
-      if (mealItems.length === 0) return true;
-      // If any items are unchecked, meal is still active
-      return mealItems.some(item => !item.checked);
-    });
-  }, [shoppingList]);
+  const { addItemsToShoppingList } = useShoppingContext();
 
 
   // Utility to filter fridge items and update fridge
@@ -61,16 +49,18 @@ export const MealPlanningMode: React.FC = () => {
   const handleAddMeal = (meal: Meal, mealIndex: number) => {
     const neededIngredients = filterIngredientsWithFridge(meal.ingredients);
     if (neededIngredients.length > 0) {
+      // Generate unique ID using timestamp to allow same meal multiple times
+      const timestamp = Date.now();
       addItemsToShoppingList(
         neededIngredients.map((ing, i) => ({
-          id: Number(`${mealIndex}${i + 1}${ing.name.length}${meal.title.length}`),
+          id: Number(`${timestamp}${mealIndex}${i}`),
           name: ing.name,
           quantity: parseInt(ing.amount) || 1,
           category: "",
           aisle: 1,
           checked: false,
           price: ing.price,
-          mealId: mealIndex,
+          mealId: Number(`${timestamp}${mealIndex}`),
         }))
       );
     }
@@ -102,12 +92,9 @@ export const MealPlanningMode: React.FC = () => {
             Popular Recipes
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {availableMeals.map((meal, index) => {
-              const originalIndex = sampleMeals.indexOf(meal);
-              return (
-                <MealCard key={originalIndex} {...meal} mealIndex={originalIndex + 1} handleAddMeal={() => handleAddMeal(meal, originalIndex + 1)} />
-              );
-            })}
+            {sampleMeals.map((meal, index) => (
+              <MealCard key={index} {...meal} mealIndex={index + 1} handleAddMeal={() => handleAddMeal(meal, index + 1)} />
+            ))}
           </div>
         </section>
       </div>
