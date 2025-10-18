@@ -51,9 +51,14 @@ export const ShoppingList = () => {
     return saved ? parseFloat(saved) : 0;
   });
 
+  const [budgetJustUpdated, setBudgetJustUpdated] = useState(false);
+
   const refreshMonthlySpent = () => {
     const saved = localStorage.getItem('monthlySpent');
     setSpentAmount(saved ? parseFloat(saved) : 0);
+    // Trigger animation when budget updates
+    setBudgetJustUpdated(true);
+    setTimeout(() => setBudgetJustUpdated(false), 1000);
   };
 
   useEffect(() => {
@@ -154,7 +159,7 @@ export const ShoppingList = () => {
 
       <div className="mt-6 pt-6 border-t-2 border-primary space-y-4">
         {/* Budget Summary */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border-2 border-blue-200">
+        <div className={`bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border-2 border-blue-200 transition-all duration-300 ${budgetJustUpdated ? 'scale-105 ring-4 ring-blue-300' : ''}`}>
           <div className="flex items-center gap-2 mb-3">
             <Wallet className="w-5 h-5 text-blue-600" />
             <span className="text-sm font-bold text-gray-700 uppercase">Månedsbudsjett</span>
@@ -163,7 +168,7 @@ export const ShoppingList = () => {
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Handlet</span>
-              <span className={`text-lg font-bold ${halfBudgetReached ? 'text-orange-600' : 'text-blue-600'}`}>
+              <span className={`text-lg font-bold transition-all duration-300 ${budgetJustUpdated ? 'scale-110' : ''} ${halfBudgetReached ? 'text-orange-600' : 'text-blue-600'}`}>
                 {spentAmount.toFixed(0)} kr
               </span>
             </div>
