@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useShoppingContext } from '@/contexts/useShoppingContext';
 import { Wallet } from 'lucide-react';
-import { apiService } from '@/services/api';
+import { toast } from 'sonner';
 
 const FindMyIngredient: React.FC = () => {
   const { getCurrentItem, markItemFound, getCompletedCount, getTotalCount, shoppingList, recordPurchaseAndRemove } = useShoppingContext();
@@ -147,10 +147,9 @@ const FindMyIngredient: React.FC = () => {
             onClick={async () => {
               setPulseAnimation(true);
               setTimeout(() => setPulseAnimation(false), 1000);
-              // Update fridge, then record and remove from list
               markItemFound(currentItem.id);
               await recordPurchaseAndRemove(currentItem.id);
-              refreshMonthlySpent();
+              toast.success(`✓ ${currentItem.name} lagt til budsjettet (${currentItem.price} kr)`);
             }}
             className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors"
           >

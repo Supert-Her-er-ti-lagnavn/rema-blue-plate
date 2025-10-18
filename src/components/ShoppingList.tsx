@@ -5,7 +5,6 @@ import { useShoppingContext } from "@/contexts/useShoppingContext";
 import { sampleMeals } from "@/components/sampleMeals";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { apiService } from "@/services/api";
 
 export const ShoppingList = () => {
   const {
@@ -128,10 +127,9 @@ export const ShoppingList = () => {
                         variant="ghost"
                         size="icon"
                         onClick={async () => {
-                          // Mark found (to update fridge) then record purchase and remove
                           markItemFound(item.id);
                           await recordPurchaseAndRemove(item.id);
-                          refreshMonthlySpent();
+                          toast.success(`✓ ${item.name} lagt til budsjettet (${item.price} kr)`);
                         }}
                         title="Mark as found"
                       >
