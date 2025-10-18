@@ -1,0 +1,20 @@
+# FastAPI Backend Dependencies for Rema Blue Plate
+# Install with: py -m pip install -r requirements.txt
+
+# Stable versions for Python 3.11
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# Optional dependencies for future features:
+
+# python-dotenv>=1.0.0          # Environment variables# pymysql==1.1.0              # MySQL database connector
+
+# sqlalchemy>=2.0.0             # Database ORM# cryptography>=3.4.8         # For JWT tokens and authentication
+
+# python-multipart>=0.0.6       # File uploads# python-jose[cryptography]    # JWT token handling
+
+# python-jose[cryptography]      # JWT tokens# passlib[bcrypt]              # Password hashing
+
+# passlib[bcrypt]                # Password hashing# python-multipart             # File upload support
+# alembic==1.13.0              # Database migrations
