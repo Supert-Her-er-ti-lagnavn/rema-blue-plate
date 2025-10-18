@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import ShoppingPage from "./pages/ShoppingPage";
 import NotFound from "./pages/NotFound";
 import { ShoppingProvider } from "@/contexts/ShoppingContext";
+import { PreferencesProvider } from "@/contexts/PreferencesContext";
 import { FridgeMode } from '@/components/FridgeMode';
 
 const queryClient = new QueryClient();
@@ -25,7 +26,8 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ShoppingProvider>
+      <PreferencesProvider>
+        <ShoppingProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -54,7 +56,8 @@ const App = () => {
             <SegmentedToggle onToggle={handleModeToggle} />
           </BrowserRouter>
         </TooltipProvider>
-      </ShoppingProvider>
+        </ShoppingProvider>
+      </PreferencesProvider>
     </QueryClientProvider>
   );
 };
