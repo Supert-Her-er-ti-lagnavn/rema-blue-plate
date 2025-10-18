@@ -1,8 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, Users, Plus } from "lucide-react";
+import { Clock, Users, Plus, Minus } from "lucide-react";
 import { useShoppingContext } from "@/contexts/useShoppingContext";
+import { toast } from "sonner";
+import { useState } from "react";
 
 interface Ingredient {
   name: string;
@@ -25,21 +27,38 @@ interface MealCardProps {
 
 export const MealCard = ({ title, image, prepTime, servings, ingredients, totalCost, mealIndex, handleAddMeal }: MealCardProps) => {
   const { addItemsToShoppingList } = useShoppingContext();
+  const [quantity, setQuantity] = useState(1);
+  const [isAdding, setIsAdding] = useState(false);
 
   // Use custom handler if provided (for fridge logic), else fallback to default
   const onAdd = handleAddMeal || (() => {
-    addItemsToShoppingList(
-      ingredients.map((ing, i) => ({
-        id: Number(`${mealIndex || 0}${i + 1}${ing.name.length}${title.length}`),
-        name: ing.name,
-        quantity: parseInt(ing.amount) || 1,
-        category: "",
-        aisle: 1,
-        checked: false,
-        price: ing.price,
-        mealId: mealIndex || 0,
-      }))
-    );
+    setIsAdding(true);
+    
+    // Add items for each quantity
+    for (let q = 0; q < quantity; q++) {
+      addItemsToShoppingList(
+        ingredients.map((ing, i) => ({
+          id: Number(`${mealIndex || 0}${i + 1}${ing.name.length}${title.length}${q}${Date.now()}`),
+          name: ing.name,
+          quantity: parseInt(ing.amount) || 1,
+          category: "",
+          aisle: 1,
+          checked: false,
+          price: ing.price,
+          mealId: mealIndex || 0,
+        }))
+      );
+    }
+
+    toast.success('✅ Lagt til i handlelisten!', {
+      description: `${quantity}x ${title} er lagt til`,
+      duration: 2000,
+    });
+
+    setTimeout(() => {
+      setIsAdding(false);
+      setQuantity(1);
+    }, 300);
   });
 
   return (
@@ -85,14 +104,41 @@ export const MealCard = ({ title, image, prepTime, servings, ingredients, totalC
           </ul>
         </div>
 
-        <Button 
-          className="w-full gap-2 font-bold uppercase text-sm" 
-          variant="default"
-          onClick={onAdd}
-        >
-          <Plus className="w-4 h-4" />
-          Add to Meal Plan
-        </Button>
+        <div className="space-y-3">
+          <div className="flex items-center justify-center gap-3 bg-secondary p-3 rounded-lg">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              disabled={quantity <= 1}
+              className="h-8 w-8"
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <span className="text-lg font-bold text-foreground min-w-[3ch] text-center">
+              {quantity}x
+            </span>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setQuantity(Math.min(10, quantity + 1))}
+              disabled={quantity >= 10}
+              className="h-8 w-8"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <Button 
+            className={`w-full gap-2 font-bold uppercase text-sm transition-all ${isAdding ? 'animate-scale-in' : ''}`}
+            variant="default"
+            onClick={onAdd}
+            disabled={isAdding}
+          >
+            <Plus className="w-4 h-4" />
+            {isAdding ? 'Legger til...' : 'Legg til i handlelisten'}
+          </Button>
+        </div>
       </div>
     </Card>
   );
