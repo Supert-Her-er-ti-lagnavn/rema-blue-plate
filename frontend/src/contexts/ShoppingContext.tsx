@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiService, PurchasedItem } from '@/services/api';
 import { ShoppingContext } from './ShoppingContextInstance';
 
 export interface ShoppingItem {
@@ -24,6 +25,7 @@ export interface ShoppingContextType {
   getCompletedCount: () => number;
   getTotalCount: () => number;
   resetShoppingList: () => void;
+  recordPurchaseAndRemove: (itemId: number) => Promise<void>;
 }
 
 
@@ -64,10 +66,8 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const addItemsToShoppingList = (items: ShoppingItem[]) => {
     setShoppingList(currentList => {
-      const newItems = items.filter(item => 
-        !currentList.some(existing => existing.id === item.id)
-      );
-      return [...currentList, ...newItems].sort((a, b) => a.aisle - b.aisle);
+      // Always add items (allow duplicates) since they have unique IDs
+      return [...currentList, ...items].sort((a, b) => a.aisle - b.aisle);
     });
   };
 
@@ -92,6 +92,36 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
       return updatedList;
     });
+  };
+
+  const recordPurchaseAndRemove = async (itemId: number) => {
+    let purchased: ShoppingItem | undefined;
+    setShoppingList(currentList => {
+      purchased = currentList.find(i => i.id === itemId);
+      return currentList.filter(item => item.id !== itemId);
+    });
+    if (purchased) {
+      // Update monthly spent in localStorage
+      const currentSpent = parseFloat(localStorage.getItem('monthlySpent') || '0');
+      const newSpent = currentSpent + purchased.price;
+      localStorage.setItem('monthlySpent', newSpent.toString());
+      window.dispatchEvent(new Event('monthlySpentUpdated'));
+
+      const payload: PurchasedItem = {
+        id: purchased.id,
+        name: purchased.name,
+        quantity: purchased.quantity,
+        category: purchased.category,
+        aisle: purchased.aisle,
+        price: purchased.price,
+        mealId: purchased.mealId,
+      };
+      try {
+        await apiService.recordPurchase(payload);
+      } catch (e) {
+        // Backend not available, but localStorage is updated
+      }
+    }
   };
 
   const removeItemFromList = (itemId: number) => {
@@ -130,6 +160,7 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     getCompletedCount,
     getTotalCount,
     resetShoppingList,
+    recordPurchaseAndRemove,
   };
 
   return (

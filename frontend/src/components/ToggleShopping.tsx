@@ -32,6 +32,7 @@ export const SegmentedToggle: React.FC<ToggleShoppingProps> = ({
 }) => {
   const [current, setCurrent] = useState<ModeType>(initialMode);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [indicator, setIndicator] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
 
@@ -46,17 +47,17 @@ export const SegmentedToggle: React.FC<ToggleShoppingProps> = ({
   const measure = () => {
     const activeIdx = MODES.findIndex(m => m.key === current);
     const btn = btnRefs.current[activeIdx];
-    const container = containerRef.current;
-    if (!btn || !container) return;
-    const { left: cLeft } = container.getBoundingClientRect();
+    const track = trackRef.current;
+    if (!btn || !track) return;
+    const { left: trackLeft } = track.getBoundingClientRect();
     const { left, width } = btn.getBoundingClientRect();
-    setIndicator({ left: left - cLeft, width });
+    setIndicator({ left: left - trackLeft, width });
   };
 
   useEffect(() => {
     measure();
     const obs = new ResizeObserver(measure);
-    if (containerRef.current) obs.observe(containerRef.current);
+    if (trackRef.current) obs.observe(trackRef.current);
     window.addEventListener("resize", measure);
     return () => {
       window.removeEventListener("resize", measure);
@@ -86,16 +87,16 @@ export const SegmentedToggle: React.FC<ToggleShoppingProps> = ({
   ), [current]);
 
   return (
-    <div className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-full px-3 ${className}`}>
+    <div className={`fixed bottom-4 left-1/2 -translate-x-1/2 w-1/2 max-w-md px-3 ${className}`}>
       <div
         ref={containerRef}
-        className="relative mx-auto max-w-2xl rounded-full border border-gray-200 bg-white/95 backdrop-blur-sm p-1 shadow-lg"
+        className="relative mx-auto w-full rounded-full border border-gray-200 bg-white/95 backdrop-blur-sm p-1 shadow-lg"
         role="tablist"
         aria-label="Mode switcher"
         onKeyDown={onKeyDown}
       >
         {/* Track */}
-        <div className="relative flex w-full gap-1 rounded-full bg-gray-100 p-1">
+        <div ref={trackRef} className="relative flex w-full gap-1 rounded-full bg-gray-100 p-1 overflow-hidden">
           {/* Animated indicator */}
           <motion.div
             className={`absolute top-1/2 -translate-y-1/2 h-10 rounded-full shadow-md bg-gradient-to-r ${colors[current]}`}

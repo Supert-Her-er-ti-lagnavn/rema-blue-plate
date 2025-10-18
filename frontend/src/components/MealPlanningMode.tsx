@@ -49,16 +49,18 @@ export const MealPlanningMode: React.FC = () => {
   const handleAddMeal = (meal: Meal, mealIndex: number) => {
     const neededIngredients = filterIngredientsWithFridge(meal.ingredients);
     if (neededIngredients.length > 0) {
+      // Generate unique ID using timestamp to allow same meal multiple times
+      const timestamp = Date.now();
       addItemsToShoppingList(
         neededIngredients.map((ing, i) => ({
-          id: Number(`${mealIndex}${i + 1}${ing.name.length}${meal.title.length}`),
+          id: Number(`${timestamp}${mealIndex}${i}`),
           name: ing.name,
           quantity: parseInt(ing.amount) || 1,
           category: "",
           aisle: 1,
           checked: false,
           price: ing.price,
-          mealId: mealIndex,
+          mealId: Number(`${timestamp}${mealIndex}`),
         }))
       );
     }

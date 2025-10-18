@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useShoppingContext } from '@/contexts/useShoppingContext';
 
 interface ShoppingItem {
   id: number;
@@ -54,6 +55,7 @@ const FALLBACK_SHOPPING_DATA: ShoppingListResponse = {
 const ShoppingMap: React.FC = () => {
   const [completedItems, setCompletedItems] = useState<Set<number>>(new Set());
   const queryClient = useQueryClient();
+  const { markItemFound, recordPurchaseAndRemove } = useShoppingContext();
 
   // Fetch shopping list from API with fallback
   const { data: shoppingData, isLoading, error } = useQuery({
@@ -91,9 +93,16 @@ const ShoppingMap: React.FC = () => {
         return { message: 'Marked locally' };
       }
     },
-    onSuccess: (_, itemId) => {
+    onSuccess: async (_, itemId) => {
       setCompletedItems(prev => new Set([...prev, itemId]));
       queryClient.invalidateQueries({ queryKey: ['shopping-list'] });
+      try {
+        // Update fridge and remove from context list while recording purchase
+        markItemFound(itemId);
+        await recordPurchaseAndRemove(itemId);
+      } catch (e) {
+        // ignore to keep map flow smooth
+      }
     }
   });
 
