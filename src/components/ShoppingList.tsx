@@ -14,9 +14,10 @@ interface ShoppingListProps {
     ingredients: Ingredient[];
   }>;
   onRemoveIngredient?: (ingredientName: string) => void;
+  onRemoveMeal?: (mealIndex: number) => void;
 }
 
-export const ShoppingList = ({ meals, onRemoveIngredient }: ShoppingListProps) => {
+export const ShoppingList = ({ meals, onRemoveIngredient, onRemoveMeal }: ShoppingListProps) => {
   const totalCost = meals.reduce((sum, meal) => 
     sum + meal.ingredients.reduce((mealSum, ing) => mealSum + ing.price, 0), 0
   );
@@ -42,12 +43,24 @@ export const ShoppingList = ({ meals, onRemoveIngredient }: ShoppingListProps) =
         <div className="space-y-6">
           {meals.map((meal, mealIndex) => (
             <div key={mealIndex} className="space-y-2">
-              <h4 className="font-black text-foreground uppercase text-sm flex items-center gap-2">
-                <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs">
-                  {mealIndex + 1}
-                </span>
-                {(meal as any).title || `Meal ${mealIndex + 1}`}
-              </h4>
+              <div className="flex items-center justify-between group">
+                <h4 className="font-black text-foreground uppercase text-sm flex items-center gap-2">
+                  <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                    {mealIndex + 1}
+                  </span>
+                  {(meal as any).title || `Meal ${mealIndex + 1}`}
+                </h4>
+                {onRemoveMeal && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => onRemoveMeal(mealIndex)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
               <div className="space-y-2 pl-8">
                 {meal.ingredients.map((ingredient, index) => (
                   <div 

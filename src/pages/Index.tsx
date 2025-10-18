@@ -165,7 +165,11 @@ const Index = () => {
       
       <div className="max-w-7xl mx-auto px-4 py-16 space-y-16">
         <section>
-          <ShoppingList meals={addedMeals} onRemoveIngredient={handleRemoveIngredient} />
+          <ShoppingList 
+            meals={addedMeals} 
+            onRemoveIngredient={handleRemoveIngredient}
+            onRemoveMeal={handleRemoveMeal}
+          />
         </section>
 
         <section>
