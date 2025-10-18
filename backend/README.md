@@ -2,31 +2,61 @@
 
 A FastAPI backend for meal planning with Norwegian Rema 1000 groceries.
 
-## Quick Start
+## 🚀 Quick Start
 
-### 1. Install Python Dependencies
+### 1. Create Virtual Environment
+
+From the **project root** directory:
+
+```bash
+# Create virtual environment
+py -m venv venv
+
+# Activate virtual environment
+venv\Scripts\Activate
+```
+
+You should see `(venv)` in your terminal prompt when activated.
+
+### 2. Install Dependencies
+
+```bash
+# Make sure venv is activated first!
+pip install fastapi uvicorn[standard]
+```
+
+Or install from requirements file:
 
 ```bash
 cd backend
-py -m pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-### 2. Test the Setup
+### 3. Test the Setup
 
 ```bash
-py test_simple.py
+# From backend directory with venv activated
+python test_simple.py
 ```
 
-### 3. Run the API Server
+### 4. Start the Backend Server
 
 ```bash
-py main.py
+# From backend directory with venv activated
+python main.py
 ```
 
 The API will be available at `http://localhost:8000`
 
+## ⚠️ Important Notes
+
+- **Always activate the virtual environment first**: `venv\Scripts\Activate`
+- **Use `python` (not `py`) when venv is activated**
+- **Deactivate with**: `deactivate`
+
 ## ✅ Ready-to-Use Features
 
+- **Virtual environment isolated** - Clean dependencies
 - **No database setup required** - Uses hardcoded Norwegian meal data
 - **CORS configured** - Ready for React frontend connection
 - **Sample meal data** - Pasta Alfredo, Marry Me Chicken, Tacosuppe, etc.
@@ -80,7 +110,37 @@ Visit `http://localhost:8000/docs` for Swagger UI
 
 ## 💡 Troubleshooting
 
-If you get "failed to locate pyvenv.cfg" error, use `py` instead of `python`:
+### Virtual Environment Issues
 
-- ✅ `py main.py`
-- ❌ `python main.py`
+- **"failed to locate pyvenv.cfg"**: Make sure virtual environment is activated
+- **Import errors**: Activate venv first, then install dependencies
+- **Wrong Python**: Use `python` (not `py`) when venv is activated
+
+### Quick Fix Commands
+
+```bash
+# If you get errors, try this sequence:
+cd ..                          # Go to project root
+venv\Scripts\Activate          # Activate venv
+cd backend                     # Go to backend
+python test_simple.py          # Test setup
+python main.py                 # Start server
+```
+
+### Alternative (Global Install)
+
+If virtual environment causes issues, you can use global install:
+
+```bash
+py -m pip install fastapi uvicorn[standard]
+py main.py
+```
+
+## 🎯 Development Workflow
+
+1. **Activate venv**: `venv\Scripts\Activate` (from project root)
+2. **Go to backend**: `cd backend`
+3. **Start server**: `python main.py`
+4. **Test in browser**: http://localhost:8000
+5. **Stop server**: `Ctrl+C`
+6. **Deactivate**: `deactivate`
