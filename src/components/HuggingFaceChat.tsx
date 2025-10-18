@@ -13,10 +13,9 @@ interface Message {
 interface HuggingFaceChatProps {
   isMinimized?: boolean;
   onToggleMinimize?: () => void;
-  inline?: boolean;
 }
 
-export function HuggingFaceChat({ isMinimized = false, onToggleMinimize, inline = false }: HuggingFaceChatProps) {
+export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: HuggingFaceChatProps) {
   const mealListPrompt = `Here are the available meals:\n${sampleMeals.map(meal => `- ${meal.title}: ${meal.ingredients.map(i => i.name).join(', ')}`).join('\n')}\nAlways suggest meals from this list in your responses, using this format.`;
   const extractMealSuggestion = (assistantText: string) => {
     for (const meal of sampleMeals) {
@@ -188,38 +187,36 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize, inline 
   }
 
   return (
-    <div className={inline ? "h-full bg-card rounded-lg shadow-lg border border-border flex flex-col" : "fixed bottom-4 right-4 z-50 w-96 h-[500px] bg-card rounded-lg shadow-2xl border border-border flex flex-col"}>
+    <div className="fixed bottom-4 right-4 z-50 w-96 h-[500px] bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-2 rounded-t-lg flex items-center justify-between">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-t-lg flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Bot className="w-4 h-4" />
-          <h3 className="font-semibold text-sm">🍳 Recipe Assistant</h3>
+          <Bot className="w-5 h-5" />
+          <h3 className="font-semibold">🍳 Recipe Assistant</h3>
         </div>
-        {onToggleMinimize && (
-          <button
-            onClick={onToggleMinimize}
-            className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
-          >
-            <MessageCircle className="w-3 h-3" />
-          </button>
-        )}
+        <button
+          onClick={onToggleMinimize}
+          className="text-white/80 hover:text-white transition-colors"
+        >
+          <MessageCircle className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Token Input (if needed) */}
       {!hfToken && (
-        <div className="p-2 bg-yellow-50 border-b border-yellow-200">
-          <div className="flex flex-col gap-1">
+        <div className="p-3 bg-yellow-50 border-b border-yellow-200">
+          <div className="flex gap-2 items-center">
             <input
               type="password"
-              placeholder="HuggingFace token..."
+              placeholder="Enter HuggingFace token..."
               onChange={(e: ChangeEvent<HTMLInputElement>) => saveToken(e.target.value)}
-              className="w-full px-2 py-1 text-xs border border-yellow-300 rounded focus:outline-none focus:ring-2 focus:ring-ring"
+              className="flex-1 px-2 py-1 text-sm border border-yellow-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <a 
               href="https://huggingface.co/settings/tokens" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-xs text-blue-600 hover:text-blue-800 text-center"
+              className="text-xs text-blue-600 hover:text-blue-800"
             >
               Get Token
             </a>
@@ -228,34 +225,34 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize, inline 
       )}
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-2 bg-muted/30">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
         {messages.length === 0 ? (
-          <div className="text-center text-muted-foreground mt-4">
-            <Bot className="w-6 h-6 mx-auto mb-1 text-muted-foreground/60" />
-            <p className="text-xs">Ask about recipes or ingredients!</p>
+          <div className="text-center text-gray-500 mt-8">
+            <Bot className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+            <p className="text-sm">Ask me about recipes, ingredients, or cooking tips!</p>
           </div>
         ) : (
           messages.map((message: Message) => (
             <div
               key={message.id}
-              className={`flex gap-1 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className={`max-w-[85%] rounded p-2 ${
+              <div className={`max-w-[80%] rounded-lg p-3 ${
                 message.role === 'user'
-                  ? 'bg-primary text-primary-foreground ml-auto'
-                  : 'bg-card border border-border'
+                  ? 'bg-blue-600 text-white ml-auto'
+                  : 'bg-white border border-gray-200'
               }`}>
-                <div className="flex items-center gap-1 mb-1">
+                <div className="flex items-center gap-2 mb-1">
                   {message.role === 'user' ? (
-                    <User className="w-2 h-2" />
+                    <User className="w-3 h-3" />
                   ) : (
-                    <Bot className="w-2 h-2" />
+                    <Bot className="w-3 h-3" />
                   )}
                   <span className="text-xs font-medium opacity-75">
-                    {message.role === 'user' ? 'You' : 'AI'}
+                    {message.role === 'user' ? 'You' : 'Assistant'}
                   </span>
                 </div>
-                <div className="text-xs whitespace-pre-wrap break-words">
+                <div className="text-sm whitespace-pre-wrap">
                   {message.content}
                 </div>
               </div>
@@ -265,26 +262,26 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize, inline 
         
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-card border border-border rounded p-2 max-w-[85%]">
-              <div className="flex items-center gap-1">
+            <div className="bg-white border border-gray-200 rounded-lg p-3 max-w-[80%]">
+              <div className="flex items-center gap-2">
                 <div className="flex gap-1">
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
                 </div>
-                <span className="text-xs text-muted-foreground">Thinking...</span>
+                <span className="text-sm text-gray-500">Assistant is thinking...</span>
               </div>
             </div>
           </div>
         )}
         {/* If a meal is suggested, show confirm button */}
         {suggestedMeal && (
-          <div className="flex justify-center mt-1">
+          <div className="flex justify-center mt-2">
             <button
-              className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded shadow text-xs"
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
               onClick={handleAddMealToShoppingList}
             >
-              Add "{suggestedMeal.title}" to list
+              Legg til ingredienser fra "{suggestedMeal.title}" i handlelisten
             </button>
           </div>
         )}
@@ -293,8 +290,8 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize, inline 
       </div>
 
       {/* Input Form */}
-      <form onSubmit={handleSubmit} className="p-2 border-t border-border bg-card rounded-b-lg">
-        <div className="flex gap-1 items-end">
+      <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 bg-white rounded-b-lg">
+        <div className="flex gap-2 items-end">
           <textarea
             value={input}
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
@@ -304,25 +301,25 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize, inline 
                 handleSubmit(e);
               }
             }}
-            placeholder={hfToken ? "Ask about recipes..." : "Enter token first"}
+            placeholder={hfToken ? "Ask about recipes, ingredients..." : "Enter token above first"}
             disabled={!hfToken || isLoading}
             rows={1}
-            className="flex-1 px-2 py-1 border border-input rounded resize-none focus:outline-none focus:ring-1 focus:ring-ring focus:border-transparent text-xs bg-background"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
           />
           <button
             type="submit"
             disabled={!input.trim() || !hfToken || isLoading}
-            className="bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground text-primary-foreground p-1.5 rounded transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white p-2 rounded-lg transition-colors"
           >
-            <Send className="w-3 h-3" />
+            <Send className="w-4 h-4" />
           </button>
           {messages.length > 0 && (
             <button
               type="button"
               onClick={clearChat}
-              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground p-1.5 rounded transition-colors"
+              className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors"
             >
-              <Trash2 className="w-3 h-3" />
+              <Trash2 className="w-4 h-4" />
             </button>
           )}
         </div>

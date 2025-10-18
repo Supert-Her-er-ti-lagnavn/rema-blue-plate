@@ -63,49 +63,49 @@ export const MealCard = ({ title, image, prepTime, servings, ingredients, totalC
           alt={title}
           className="w-full h-full object-cover"
         />
-        <div className="absolute top-2 right-2">
-          <Badge className="bg-primary text-primary-foreground font-bold text-sm px-2 py-1">
+        <div className="absolute top-4 right-4">
+          <Badge className="bg-primary text-primary-foreground font-bold text-base px-3 py-1">
             {totalCost} kr
           </Badge>
         </div>
       </div>
       
-      <div className="p-3 space-y-2">
-        <h3 className="text-base font-black text-foreground uppercase tracking-tight">{title}</h3>
+      <div className="p-6 space-y-4">
+        <h3 className="text-xl font-black text-foreground uppercase tracking-tight">{title}</h3>
         
-        <div className="flex items-center gap-3 text-xs text-muted-foreground font-semibold">
+        <div className="flex items-center gap-4 text-sm text-muted-foreground font-semibold">
           <div className="flex items-center gap-1">
-            <Clock className="w-3 h-3" />
+            <Clock className="w-4 h-4" />
             <span>{prepTime} min</span>
           </div>
           <div className="flex items-center gap-1">
-            <Users className="w-3 h-3" />
+            <Users className="w-4 h-4" />
             <span>{servings} servings</span>
           </div>
         </div>
 
-        <div className="space-y-1">
-          <h4 className="font-bold text-foreground uppercase text-xs">Ingredients:</h4>
-          <ul className="space-y-1">
+        <div className="space-y-2">
+          <h4 className="font-bold text-foreground uppercase text-sm">Ingredients:</h4>
+          <ul className="space-y-1.5">
             {ingredients.map((ingredient, index) => (
-              <li key={index} className="flex justify-between text-xs border-b border-border pb-1">
-                <span className="text-foreground font-medium truncate">
+              <li key={index} className="flex justify-between text-sm border-b border-border pb-1.5">
+                <span className="text-foreground font-medium">
                   {ingredient.amount} {ingredient.name}
                 </span>
-                <span className="font-bold text-foreground whitespace-nowrap ml-2">{ingredient.price} kr</span>
+                <span className="font-bold text-foreground">{ingredient.price} kr</span>
               </li>
             ))}
           </ul>
         </div>
 
         <Button 
-          className={`w-full gap-1 font-bold uppercase text-xs transition-all py-2 ${isAdding ? 'animate-scale-in' : ''}`}
+          className={`w-full gap-2 font-bold uppercase text-sm transition-all ${isAdding ? 'animate-scale-in' : ''}`}
           variant="default"
           onClick={onAdd}
           disabled={isAdding}
         >
-          <Plus className="w-3 h-3" />
-          {isAdding ? 'Adding...' : 'Add to List'}
+          <Plus className="w-4 h-4" />
+          {isAdding ? 'Legger til...' : 'Legg til i handlelisten'}
         </Button>
       </div>
     </Card>

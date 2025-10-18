@@ -2,7 +2,6 @@
 import React from 'react';
 import { MealCard } from "@/components/MealCard";
 import { ShoppingList } from "@/components/ShoppingList";
-import { HuggingFaceChat } from "@/components/HuggingFaceChat";
 import { useShoppingContext } from "@/contexts/useShoppingContext";
 import { sampleMeals } from "@/components/sampleMeals";
 
@@ -69,39 +68,35 @@ export const MealPlanningMode: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="text-center py-6 border-b border-border">
-        <h2 className="text-3xl font-black text-foreground mb-2 uppercase tracking-tight">
-          📅 Meal Planning
-        </h2>
-        <p className="text-muted-foreground">
-          Plan your weekly meals and discover new recipes
-        </p>
-      </div>
+      <div className="max-w-7xl mx-auto px-4 py-8 pb-24 space-y-16">
+        {/* SECTION 1: MODE HEADER */}
+        <section>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-black text-foreground mb-2 uppercase tracking-tight">
+              📅 Meal Planning
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Plan your weekly meals and discover new recipes
+            </p>
+          </div>
+        </section>
 
-      {/* Three Column Layout: 1/6 Chatbot, 3/6 Recipes, 2/6 Shopping List */}
-      <div className="flex gap-3 p-3 h-[calc(100vh-140px)]">
-        {/* Chatbot - 1/6 */}
-        <div className="flex-[1]">
-          <HuggingFaceChat isMinimized={false} inline={true} />
-        </div>
+        {/* SECTION 2: SHOPPING LIST - Now context-driven */}
+        <section>
+          <ShoppingList />
+        </section>
 
-        {/* Popular Recipes - 3/6 */}
-        <div className="flex-[3] overflow-y-auto pr-2">
-          <h2 className="text-2xl font-black text-foreground mb-4 uppercase tracking-tight">
+        {/* SECTION 4: POPULAR RECIPES - Add to shopping list via context and fridge logic */}
+        <section>
+          <h2 className="text-3xl font-black text-foreground mb-8 uppercase tracking-tight">
             Popular Recipes
           </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 pb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sampleMeals.map((meal, index) => (
               <MealCard key={index} {...meal} mealIndex={index + 1} handleAddMeal={() => handleAddMeal(meal, index + 1)} />
             ))}
           </div>
-        </div>
-
-        {/* Shopping List - 2/6 */}
-        <div className="flex-[2] overflow-y-auto">
-          <ShoppingList />
-        </div>
+        </section>
       </div>
     </div>
   );
