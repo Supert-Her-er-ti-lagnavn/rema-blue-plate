@@ -51,41 +51,35 @@ class ApiService {
     return this.fetchApi('/shopping/list');
   }
 
-  async addToShoppingList(item: Omit<ShoppingListItem, 'id'>): Promise<ShoppingListItem> {
-    return this.fetchApi('/shopping/list/add', {
+  async markItemComplete(itemId: number): Promise<{ message: string; next_item_index: number; completed_count: number }> {
+    return this.fetchApi(`/shopping/items/${itemId}/complete`, {
       method: 'POST',
-      body: JSON.stringify(item),
     });
   }
 
-  async addMealToShoppingList(meal: Pick<Meal, 'id' | 'title' | 'ingredients'>): Promise<{ message: string; items: ShoppingListItem[] }> {
-    return this.fetchApi('/shopping/list/add-meal', {
+  async getShoppingProgress(): Promise<{ total_items: number; completed_items: number; current_item_index: number; progress_percentage: number }> {
+    return this.fetchApi('/shopping/progress');
+  }
+
+  async resetShoppingList(): Promise<{ message: string }> {
+    return this.fetchApi('/shopping/reset', {
       method: 'POST',
-      body: JSON.stringify(meal),
     });
   }
 
-  async updateShoppingItem(itemId: number, updates: Partial<ShoppingListItem>): Promise<{ message: string; item: ShoppingListItem }> {
-    return this.fetchApi(`/shopping/list/item/${itemId}`, {
-      method: 'PUT',
-      body: JSON.stringify(updates),
-    });
-  }
-
-  async removeFromShoppingList(itemId: number): Promise<{ message: string }> {
-    return this.fetchApi(`/shopping/list/item/${itemId}`, {
-      method: 'DELETE',
-    });
-  }
-
-  async clearShoppingList(): Promise<{ message: string }> {
-    return this.fetchApi('/shopping/list/clear', {
-      method: 'DELETE',
-    });
-  }
-
-  async getStoreNavigation(): Promise<StoreNavigation> {
+  async getStoreNavigation(): Promise<{ current_location: string; available_directions: string[]; nearby_sections: string[]; estimated_shopping_time: string; items_remaining: number }> {
     return this.fetchApi('/shopping/navigation');
+  }
+
+  async getFindMyIngredient(): Promise<FindMyIngredientResponse> {
+    return this.fetchApi('/shopping/find-my-ingredient');
+  }
+
+  async updateUserPosition(position: { x: number; y: number }): Promise<{ message: string; current_position: { x: number; y: number } }> {
+    return this.fetchApi('/shopping/update-position', {
+      method: 'POST',
+      body: JSON.stringify(position),
+    });
   }
 
   // Users API
@@ -197,4 +191,21 @@ export interface StoreNavigation {
   nearby_sections: string[];
   estimated_shopping_time: string;
   items_remaining: number;
+}
+
+export interface FindMyIngredientItem extends ShoppingListItem {
+  x_position: number;
+  y_position: number;
+}
+
+export interface FindMyIngredientResponse {
+  current_item: FindMyIngredientItem | null;
+  direction_angle: number;
+  distance: number;
+  current_location: { x: number; y: number };
+  target_location: { x: number; y: number };
+  items: FindMyIngredientItem[];
+  completed_items: number;
+  total_items: number;
+  progress_percentage: number;
 }
