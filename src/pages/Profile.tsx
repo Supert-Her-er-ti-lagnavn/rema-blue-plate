@@ -1,24 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Mail, Phone, MapPin, Save } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, MapPin, Save, Leaf, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { usePreferences } from '@/contexts/PreferencesContext';
+import type { DietaryPreference } from '@/contexts/PreferencesContext';
 
 interface ProfileData {
   name: string;
   email: string;
   phone: string;
   address: string;
+  monthlyBudget: number;
 }
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
+  const { dietaryPreference, setDietaryPreference } = usePreferences();
   const [profile, setProfile] = useState<ProfileData>({
     name: '',
     email: '',
     phone: '',
     address: '',
+    monthlyBudget: 5000,
   });
 
   useEffect(() => {
@@ -32,6 +37,13 @@ const Profile: React.FC = () => {
     localStorage.setItem('userProfile', JSON.stringify(profile));
     toast.success('Profil lagret!');
   };
+
+  const dietaryOptions: { value: DietaryPreference; label: string; icon: string }[] = [
+    { value: 'omnivore', label: 'Omnivore', icon: '🍖' },
+    { value: 'vegetarian', label: 'Vegetarian', icon: '🥗' },
+    { value: 'vegan', label: 'Vegan', icon: '🌱' },
+    { value: 'eco', label: 'Miljøvennlig', icon: '🌍' },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 pb-24">
@@ -111,6 +123,58 @@ const Profile: React.FC = () => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Gateadresse, postnummer, sted"
               />
+            </div>
+
+            <div className="pt-4 border-t">
+              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                <Leaf size={16} />
+                Kostholdsvalg
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                {dietaryOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setDietaryPreference(option.value)}
+                    className={`px-4 py-3 rounded-lg border-2 transition-all ${
+                      dietaryPreference === option.value
+                        ? 'border-blue-500 bg-blue-50 shadow-sm'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">{option.icon}</div>
+                    <div className="text-sm font-medium">{option.label}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-4">
+              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                <Wallet size={16} />
+                Månedsbudsjett
+              </label>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Ønsket budsjett per måned</span>
+                  <span className="text-lg font-bold text-blue-600">{profile.monthlyBudget} kr</span>
+                </div>
+                <input
+                  type="range"
+                  min="1000"
+                  max="20000"
+                  step="500"
+                  value={profile.monthlyBudget}
+                  onChange={(e) => setProfile({ ...profile, monthlyBudget: parseInt(e.target.value) })}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                  style={{
+                    background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((profile.monthlyBudget - 1000) / 19000) * 100}%, #e5e7eb ${((profile.monthlyBudget - 1000) / 19000) * 100}%, #e5e7eb 100%)`
+                  }}
+                />
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>1 000 kr</span>
+                  <span>20 000 kr</span>
+                </div>
+              </div>
             </div>
 
             <Button
