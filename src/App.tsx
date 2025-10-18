@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ChatWidget } from "@/components/ChatWidget";
-import { ToggleShopping } from "@/components/ToggleShopping";
+import SegmentedToggle from "@/components/ToggleShopping";
 import { Header } from "@/components/Header";
 import Index from "./pages/Index";
 import ShoppingPage from "./pages/ShoppingPage";
@@ -51,7 +51,7 @@ const App = () => {
             {/* Global Chat Widget - appears on all pages */}
             <ChatWidget />
             {/* Sticky Toggle at Bottom - appears on all pages */}
-            <ToggleShopping onToggle={handleModeToggle} />
+            <SegmentedToggle onToggle={handleModeToggle} />
           </BrowserRouter>
         </TooltipProvider>
       </ShoppingProvider>

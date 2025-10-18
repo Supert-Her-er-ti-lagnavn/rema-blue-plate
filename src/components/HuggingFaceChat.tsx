@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
+import { sampleMeals } from "@/components/sampleMeals";
+import { useShoppingContext } from "@/contexts/useShoppingContext";
 import { MessageCircle, Send, Trash2, Bot, User } from 'lucide-react';
 
 interface Message {
@@ -14,6 +16,16 @@ interface HuggingFaceChatProps {
 }
 
 export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: HuggingFaceChatProps) {
+  const mealListPrompt = `Here are the available meals:\n${sampleMeals.map(meal => `- ${meal.title}: ${meal.ingredients.map(i => i.name).join(', ')}`).join('\n')}\nAlways suggest meals from this list in your responses, using this format.`;
+  const extractMealSuggestion = (assistantText: string) => {
+    for (const meal of sampleMeals) {
+      if (assistantText.includes(meal.title)) {
+        return meal;
+      }
+    }
+    return null;
+  };
+  const [suggestedMeal, setSuggestedMeal] = useState<null | { title: string; ingredients: { name: string; amount: string; price: number }[] }>(null);
   // Preset configuration (hidden from user)
   const PRESET_CONFIG = {
     model: import.meta.env.VITE_DEFAULT_MODEL || 'meta-llama/Meta-Llama-3-8B-Instruct',
@@ -70,7 +82,7 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: Huggi
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful cooking and meal planning assistant. Help users with recipes, meal planning, ingredient substitutions, and cooking tips. Be concise and practical.'
+            content: `You are a helpful cooking and meal planning assistant. ${mealListPrompt} Help users with recipes, meal planning, ingredient substitutions, and cooking tips. Be concise and practical.`
           },
           {
             role: 'user',
@@ -113,15 +125,16 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: Huggi
 
     try {
       const response = await callHuggingFaceAPI(userMessage.content);
-      
       const assistantMessage: Message = {
         id: generateId(),
         role: 'assistant',
         content: response,
         timestamp: new Date(),
       };
-
       setMessages((prev: Message[]) => [...prev, assistantMessage]);
+      // Try to extract a meal suggestion
+      const meal = extractMealSuggestion(response);
+      setSuggestedMeal(meal ? { title: meal.title, ingredients: meal.ingredients } : null);
     } catch (error) {
       console.error('Error calling Hugging Face:', error);
       const errorMessage: Message = {
@@ -138,7 +151,27 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: Huggi
 
   const clearChat = () => {
     setMessages([]);
+    setSuggestedMeal(null);
   };
+  const { addItemsToShoppingList } = useShoppingContext();
+
+  // Convert meal ingredients to ShoppingItem format
+  const handleAddMealToShoppingList = () => {
+    if (!suggestedMeal) return;
+    // Convert ingredients to ShoppingItem[] (minimal fields)
+    const items = suggestedMeal.ingredients.map((ingredient, idx) => ({
+      id: Date.now() + idx,
+      name: ingredient.name,
+      quantity: 1,
+      category: "Annet",
+      aisle: 0,
+      checked: false,
+      price: ingredient.price || 0,
+    }));
+    addItemsToShoppingList(items);
+    setSuggestedMeal(null);
+  };
+
 
   if (isMinimized) {
     return (
@@ -239,6 +272,17 @@ export function HuggingFaceChat({ isMinimized = false, onToggleMinimize }: Huggi
                 <span className="text-sm text-gray-500">Assistant is thinking...</span>
               </div>
             </div>
+          </div>
+        )}
+        {/* If a meal is suggested, show confirm button */}
+        {suggestedMeal && (
+          <div className="flex justify-center mt-2">
+            <button
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
+              onClick={handleAddMealToShoppingList}
+            >
+              Legg til ingredienser fra "{suggestedMeal.title}" i handlelisten
+            </button>
           </div>
         )}
         

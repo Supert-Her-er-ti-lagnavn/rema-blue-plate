@@ -72,11 +72,26 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const markItemFound = (itemId: number) => {
-    setShoppingList(currentList =>
-      currentList.map(item =>
+    setShoppingList(currentList => {
+      const updatedList = currentList.map(item =>
         item.id === itemId ? { ...item, checked: true } : item
-      )
-    );
+      );
+      // Find the item that was marked as found
+      const foundItem = currentList.find(item => item.id === itemId);
+      if (foundItem) {
+        // Get fridge items from localStorage
+        const fridgeItems: ShoppingItem[] = JSON.parse(localStorage.getItem('fridgeItems') || '[]');
+        // Add to fridge if not already present (by name)
+        if (!fridgeItems.some(i => i.name.trim().toLowerCase() === foundItem.name.trim().toLowerCase())) {
+          fridgeItems.push({
+            ...foundItem,
+            checked: false,
+          });
+          localStorage.setItem('fridgeItems', JSON.stringify(fridgeItems));
+        }
+      }
+      return updatedList;
+    });
   };
 
   const removeItemFromList = (itemId: number) => {

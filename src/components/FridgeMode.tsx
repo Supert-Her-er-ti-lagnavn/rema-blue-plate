@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 
 interface FridgeItem {
-  id: number;
+  id: string;
   name: string;
   amount: string;
   addedDate: string;
@@ -34,8 +34,11 @@ export const FridgeMode: React.FC = () => {
       return;
     }
 
+    // Use ingredient name as ID
+    const newId = newItemName.trim().toLowerCase();
+
     const newItem: FridgeItem = {
-      id: Date.now(),
+      id: newId,
       name: newItemName.trim(),
       amount: newItemAmount.trim() || '1x',
       addedDate: new Date().toISOString(),
@@ -47,7 +50,7 @@ export const FridgeMode: React.FC = () => {
     toast.success(`Added ${newItem.name} to fridge`);
   };
 
-  const handleRemoveItem = (id: number) => {
+  const handleRemoveItem = (id: string) => {
     const item = fridgeItems.find(i => i.id === id);
     saveFridgeItems(fridgeItems.filter(i => i.id !== id));
     if (item) {
