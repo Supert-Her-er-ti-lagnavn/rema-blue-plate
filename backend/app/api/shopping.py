@@ -1,7 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from typing import List
-from app.core.database import get_db
+from fastapi import APIRouter
 
 router = APIRouter()
 
@@ -62,7 +59,7 @@ async def update_shopping_item(item_id: int, updates: dict):
             item.update(updates)
             return {"message": "Item updated", "item": item}
     
-    raise HTTPException(status_code=404, detail="Item not found")
+    return {"error": "Item not found"}
 
 @router.delete("/list/item/{item_id}")
 async def remove_from_shopping_list(item_id: int):

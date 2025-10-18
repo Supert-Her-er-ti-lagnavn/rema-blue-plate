@@ -1,14 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from typing import List
-from app.core.database import get_db
-from app.schemas import Meal, MealCreate
-import json
+from fastapi import APIRouter
 
 router = APIRouter()
 
-# Hardcoded Norwegian meal data (will be replaced with DB later)
-HARDCODED_MEALS = [
+# Hardcoded Norwegian meal data for testing
+MEALS_DATA = [
     {
         "id": 1,
         "title": "Pasta Alfredo med Kylling",
@@ -91,17 +86,17 @@ HARDCODED_MEALS = [
     }
 ]
 
-@router.get("/", response_model=List[dict])
+@router.get("/")
 async def get_meals():
     """Get all available meals"""
-    return HARDCODED_MEALS
+    return MEALS_DATA
 
-@router.get("/{meal_id}", response_model=dict)
+@router.get("/{meal_id}")
 async def get_meal(meal_id: int):
     """Get a specific meal by ID"""
-    meal = next((meal for meal in HARDCODED_MEALS if meal["id"] == meal_id), None)
+    meal = next((meal for meal in MEALS_DATA if meal["id"] == meal_id), None)
     if not meal:
-        raise HTTPException(status_code=404, detail="Meal not found")
+        return {"error": "Meal not found"}
     return meal
 
 @router.get("/search/{query}")
@@ -110,7 +105,7 @@ async def search_meals(query: str):
     query = query.lower()
     filtered_meals = []
     
-    for meal in HARDCODED_MEALS:
+    for meal in MEALS_DATA:
         # Search in title
         if query in meal["title"].lower():
             filtered_meals.append(meal)
@@ -124,10 +119,10 @@ async def search_meals(query: str):
     
     return filtered_meals
 
-@router.post("/", response_model=dict)
+@router.post("/")
 async def create_meal(meal: dict):
     """Create a new meal (for future use)"""
     # For now, just return the meal with a new ID
-    new_id = max(meal["id"] for meal in HARDCODED_MEALS) + 1
+    new_id = max(m["id"] for m in MEALS_DATA) + 1
     new_meal = {**meal, "id": new_id}
     return new_meal
