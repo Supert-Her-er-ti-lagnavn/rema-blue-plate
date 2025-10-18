@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Mail, Phone, MapPin, Save, Leaf, Wallet } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, MapPin, Save, Leaf, Wallet, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
@@ -13,11 +13,13 @@ interface ProfileData {
   phone: string;
   address: string;
   monthlyBudget: number;
+  profilePicture?: string;
 }
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
   const { dietaryPreference, setDietaryPreference } = usePreferences();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [profile, setProfile] = useState<ProfileData>({
     name: '',
     email: '',
@@ -36,6 +38,21 @@ const Profile: React.FC = () => {
   const handleSave = () => {
     localStorage.setItem('userProfile', JSON.stringify(profile));
     toast.success('Profil lagret!');
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Bildet er for stort. Maksimal størrelse er 5MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfile({ ...profile, profilePicture: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const dietaryOptions: { value: DietaryPreference; label: string; icon: string }[] = [
@@ -59,8 +76,28 @@ const Profile: React.FC = () => {
 
         <Card className="p-6 shadow-xl">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-              <User className="text-white" size={32} />
+            <div className="relative">
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center overflow-hidden">
+                {profile.profilePicture ? (
+                  <img src={profile.profilePicture} alt="Profilbilde" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="text-white" size={32} />
+                )}
+              </div>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 shadow-lg transition-colors"
+                aria-label="Last opp profilbilde"
+              >
+                <Camera size={16} />
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Min Profil</h1>
