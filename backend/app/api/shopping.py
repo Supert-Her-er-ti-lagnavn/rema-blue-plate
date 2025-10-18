@@ -2,6 +2,9 @@ from fastapi import APIRouter, HTTPException
 from typing import List, Optional
 from pydantic import BaseModel
 import math
+import json
+from datetime import datetime
+from pathlib import Path
 
 router = APIRouter()
 
@@ -32,6 +35,49 @@ class ShoppingListResponse(BaseModel):
     current_item_index: int
     total_items: int
     completed_items: int
+
+
+class PurchasedItem(BaseModel):
+    id: int
+    name: str
+    quantity: int
+    category: str
+    aisle: int
+    price: float
+    mealId: Optional[int] = None
+    purchased_at: Optional[str] = None
+
+
+def _get_data_dir() -> Path:
+    # Create a data directory relative to this file for simple JSON storage
+    data_dir = Path(__file__).resolve().parent.parent / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    return data_dir
+
+
+def _get_month_file_path(now: Optional[datetime] = None) -> Path:
+    dt = now or datetime.now()
+    filename = f"purchases-{dt.strftime('%Y-%m')}.json"
+    return _get_data_dir() / filename
+
+
+def _read_month_purchases() -> List[dict]:
+    file_path = _get_month_file_path()
+    if not file_path.exists():
+        return []
+    try:
+        content = json.loads(file_path.read_text(encoding="utf-8"))
+        if isinstance(content, list):
+            return content
+        # If file exists but is malformed, start fresh
+        return []
+    except Exception:
+        return []
+
+
+def _write_month_purchases(purchases: List[dict]) -> None:
+    file_path = _get_month_file_path()
+    file_path.write_text(json.dumps(purchases, ensure_ascii=False, indent=2), encoding="utf-8")
 
 # Dummy shopping list data with store coordinates (900x700 store layout)
 DUMMY_SHOPPING_LIST = [
@@ -102,6 +148,33 @@ async def mark_item_complete(item_id: int):
         "next_item_index": current_item_index,
         "completed_count": len(completed_items)
     }
+
+
+@router.post("/purchases")
+async def record_purchase(item: PurchasedItem):
+    """Record a purchased item into a month-specific JSON file."""
+    purchases = _read_month_purchases()
+    record = item.dict()
+    record["purchased_at"] = datetime.now().isoformat()
+    purchases.append(record)
+    _write_month_purchases(purchases)
+    return {"message": "Purchase recorded", "count_this_month": len(purchases)}
+
+
+@router.get("/purchases/current-month")
+async def get_current_month_purchases():
+    """Return all purchases recorded for the current month along with totals."""
+    purchases = _read_month_purchases()
+    total_spent = 0.0
+    for p in purchases:
+        try:
+            qty = float(p.get("quantity", 1))
+        except Exception:
+            qty = 1.0
+        price = float(p.get("price", 0.0))
+        # Only multiply price by quantity if quantity looks like a count
+        total_spent += price * qty if qty > 1 and qty < 20 else price
+    return {"items": purchases, "total_spent": round(total_spent, 2)}
 
 @router.get("/progress")
 async def get_shopping_progress():

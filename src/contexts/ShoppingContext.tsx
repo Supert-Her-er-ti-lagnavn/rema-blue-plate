@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiService, PurchasedItem } from '@/services/api';
 import { ShoppingContext } from './ShoppingContextInstance';
 
 export interface ShoppingItem {
@@ -24,6 +25,7 @@ export interface ShoppingContextType {
   getCompletedCount: () => number;
   getTotalCount: () => number;
   resetShoppingList: () => void;
+  recordPurchaseAndRemove: (itemId: number) => Promise<void>;
 }
 
 
@@ -94,6 +96,32 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   };
 
+  const recordPurchaseAndRemove = async (itemId: number) => {
+    let purchased: ShoppingItem | undefined;
+    setShoppingList(currentList => {
+      purchased = currentList.find(i => i.id === itemId);
+      return currentList.filter(item => item.id !== itemId);
+    });
+    if (purchased) {
+      const payload: PurchasedItem = {
+        id: purchased.id,
+        name: purchased.name,
+        quantity: purchased.quantity,
+        category: purchased.category,
+        aisle: purchased.aisle,
+        price: purchased.price,
+        mealId: purchased.mealId,
+      };
+      try {
+        await apiService.recordPurchase(payload);
+      } catch (e) {
+        // If backend fails, re-add item to list to avoid data loss
+        setShoppingList(current => [purchased as ShoppingItem, ...current]);
+        throw e;
+      }
+    }
+  };
+
   const removeItemFromList = (itemId: number) => {
     setShoppingList(currentList =>
       currentList.filter(item => item.id !== itemId)
@@ -130,6 +158,7 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     getCompletedCount,
     getTotalCount,
     resetShoppingList,
+    recordPurchaseAndRemove,
   };
 
   return (

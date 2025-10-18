@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useShoppingContext } from '@/contexts/useShoppingContext';
 import { Wallet } from 'lucide-react';
+import { apiService } from '@/services/api';
 
 const FindMyIngredient: React.FC = () => {
-  const { getCurrentItem, markItemFound, getCompletedCount, getTotalCount, shoppingList } = useShoppingContext();
+  const { getCurrentItem, markItemFound, getCompletedCount, getTotalCount, shoppingList, recordPurchaseAndRemove } = useShoppingContext();
   const [userPosition, setUserPosition] = useState({ x: 450, y: 600 });
   const [pulseAnimation, setPulseAnimation] = useState(false);
   const [monthlyBudget, setMonthlyBudget] = useState(5000);
@@ -21,20 +22,21 @@ const FindMyIngredient: React.FC = () => {
   const totalCount = getTotalCount();
   const progressPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
-  // Calculate spent amount (only checked items)
-  const seenSpent = new Set<string>();
-  const spentAmount = shoppingList.reduce((sum, item) => {
-    if (!item.checked) return sum;
-    const key = `${item.name}|${item.mealId || ''}`;
-    if (seenSpent.has(key)) return sum;
-    seenSpent.add(key);
-    const qty = Number(item.quantity);
-    if (!isNaN(qty) && qty > 1 && qty < 20) {
-      return sum + (item.price * qty);
-    } else {
-      return sum + item.price;
+  // Spent amount from backend monthly purchases
+  const [spentAmount, setSpentAmount] = useState(0);
+
+  const refreshMonthlySpent = async () => {
+    try {
+      const res = await apiService.getCurrentMonthPurchases();
+      setSpentAmount(res.total_spent || 0);
+    } catch (e) {
+      // ignore backend errors for UI
     }
-  }, 0);
+  };
+
+  useEffect(() => {
+    refreshMonthlySpent();
+  }, []);
 
   const budgetPercentage = (spentAmount / monthlyBudget) * 100;
 
@@ -141,10 +143,13 @@ const FindMyIngredient: React.FC = () => {
         {/* Action Buttons */}
         <div className="space-y-3">
           <button
-            onClick={() => {
+            onClick={async () => {
               setPulseAnimation(true);
               setTimeout(() => setPulseAnimation(false), 1000);
+              // Update fridge, then record and remove from list
               markItemFound(currentItem.id);
+              await recordPurchaseAndRemove(currentItem.id);
+              refreshMonthlySpent();
             }}
             className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors"
           >
