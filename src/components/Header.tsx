@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Bell, Leaf, User } from 'lucide-react';
+import { Bell, Leaf, User, UserCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { Badge } from '@/components/ui/badge';
 
 export const Header: React.FC = () => {
+  const navigate = useNavigate();
   const { dietaryPreference, setDietaryPreference } = usePreferences();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -42,7 +44,17 @@ export const Header: React.FC = () => {
 
           {menuOpen && (
             <div className="absolute top-12 left-0 w-56 bg-white rounded-lg shadow-xl ring-1 ring-black/5 overflow-hidden z-50">
-              <div className="px-3 py-2 text-xs font-semibold text-gray-500">Dietary preference</div>
+              <button
+                className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-2 border-b"
+                onClick={() => {
+                  navigate('/profile');
+                  setMenuOpen(false);
+                }}
+              >
+                <UserCircle size={16} />
+                <span className="font-medium">Min Profil</span>
+              </button>
+              <div className="px-3 py-2 text-xs font-semibold text-gray-500">Kostholdsvalg</div>
               <button
                 className={`w-full text-left px-4 py-2 hover:bg-gray-50 ${
                   dietaryPreference === 'omnivore' ? 'bg-gray-50' : ''

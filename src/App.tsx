@@ -9,6 +9,7 @@ import SegmentedToggle from "@/components/ToggleShopping";
 import { Header } from "@/components/Header";
 import Index from "./pages/Index";
 import ShoppingPage from "./pages/ShoppingPage";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import { ShoppingProvider } from "@/contexts/ShoppingContext";
 import { PreferencesProvider } from "@/contexts/PreferencesContext";
@@ -41,12 +42,13 @@ const App = () => {
                   currentMode === 'shopping' ? (
                     <ShoppingPage />
                   ) : currentMode === 'fridge' ? (
-                    <FridgeMode /> // Add a component for fridge mode if it exists
+                    <FridgeMode />
                   ) : (
                     <Index currentMode={currentMode} />
                   )
                 }
               />
+              <Route path="/profile" element={<Profile />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
