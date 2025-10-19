@@ -20,9 +20,32 @@ workflow.add_edge("select_recipes", END)
 # Compile the graph
 graph = workflow.compile()
 
-# For chat refinement, we'll create a separate simple workflow
+# For chat refinement, create a workflow that supports re-search
 chat_workflow = StateGraph(GraphState)
 chat_workflow.add_node("handle_chat", handle_chat_refinement)
+chat_workflow.add_node("select_recipes", select_diverse_recipes)
+
+# Start with chat handler
 chat_workflow.add_edge(START, "handle_chat")
-chat_workflow.add_edge("handle_chat", END)
+
+# After chat: decide whether to re-search or end
+def should_research(state: GraphState) -> str:
+    """Decide if we need to re-search based on action."""
+    action = state.get("action", "question")
+    if action == "re_search":
+        return "select_recipes"
+    return END
+
+chat_workflow.add_conditional_edges(
+    "handle_chat",
+    should_research,
+    {
+        "select_recipes": "select_recipes",
+        END: END
+    }
+)
+
+# After re-search, end
+chat_workflow.add_edge("select_recipes", END)
+
 chat_graph = chat_workflow.compile()

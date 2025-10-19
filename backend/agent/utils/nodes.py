@@ -1,38 +1,74 @@
 """Node functions for the LangGraph agent."""
 
 import random
+import json
 from typing import List
 from agent.utils.state import GraphState
+from agent.utils.tools import search_edamam_recipes
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 from app.config import settings
 
 
-def select_diverse_recipes(state: GraphState) -> GraphState:
+async def select_diverse_recipes(state: GraphState) -> GraphState:
     """
-    Agent node that selects 5-10 diverse recipes from the provided list.
+    Agent node that searches Edamam API and selects 9+ diverse recipes.
 
-    Uses GPT-4o-mini to ensure variety in:
-    - Cuisine types
-    - Main proteins
-    - Cooking methods
-    - Complexity levels
+    The agent:
+    1. Receives family member preferences from state
+    2. Calls search_edamam_recipes tool to get ~30 recipes
+    3. Selects 9+ recipes with 70% smart variety + 30% random discovery
+    4. Returns all recipes if fewer than 9 available
     """
-    all_recipes = state["all_recipes"]
+    # Get family member info and preferences
+    family_info = state.get("family_members_info", "")
+    diet_labels = state.get("diet_labels", [])
+    excluded_ingredients = state.get("excluded_ingredients", [])
 
+    # Check if agent should search (initial search or re-search)
+    # If all_recipes is empty, agent needs to search
+    should_search = len(state.get("all_recipes", [])) == 0
+
+    if not should_search:
+        # Already have recipes, just select from them
+        all_recipes = state["all_recipes"]
+    else:
+        # Agent needs to search Edamam API
+        print(f"Agent searching Edamam API with health_labels={diet_labels}, excluded={excluded_ingredients}")
+
+        try:
+            # Call the Edamam API tool
+            all_recipes = await search_edamam_recipes.ainvoke({
+                "health_labels": diet_labels,
+                "excluded": excluded_ingredients,
+                "query": None,  # Agent can decide to use query if needed
+                "max_results": 30
+            })
+
+            # Update state with fetched recipes
+            state["all_recipes"] = all_recipes
+            print(f"Agent fetched {len(all_recipes)} recipes from Edamam")
+
+        except Exception as e:
+            print(f"Error calling Edamam API: {e}")
+            state["all_recipes"] = []
+            state["selected_recipes"] = []
+            return state
+
+    # If no recipes found, return empty
     if not all_recipes:
         state["selected_recipes"] = []
         return state
 
-    # If we have fewer than 10 recipes, return them all
-    if len(all_recipes) <= 10:
+    # If fewer than 9 recipes, return all of them
+    if len(all_recipes) <= 9:
         state["selected_recipes"] = all_recipes
         return state
 
-    # Initialize LLM
+    # Agent selects 9+ recipes with variety
     llm = ChatOpenAI(model=settings.OPENAI_MODEL, temperature=0.7)
 
-    # Create a simplified recipe list for the prompt
+    # Create recipe summaries for the agent
     recipe_summaries = []
     for i, recipe in enumerate(all_recipes):
         summary = {
@@ -42,24 +78,37 @@ def select_diverse_recipes(state: GraphState) -> GraphState:
             "dish_type": recipe.get("dishType", []),
             "meal_type": recipe.get("mealType", []),
             "cooking_time": recipe.get("totalTime", 0),
+            "calories": recipe.get("calories", 0),
         }
         recipe_summaries.append(summary)
 
-    # Prompt for the agent
-    system_prompt = """You are a meal planning assistant helping users select diverse and interesting recipes.
+    # Build system prompt with family info
+    system_prompt = f"""You are a meal planning assistant helping users find diverse and interesting recipes.
 
-Your task is to select between 5-10 recipes from the provided list, ensuring maximum variety in:
-- Cuisine types (Italian, Asian, Mexican, etc.)
-- Main ingredients and proteins
-- Dish types (soup, salad, main course, etc.)
-- Cooking times (quick meals and more elaborate dishes)
+{family_info}
 
-Avoid selecting very similar recipes. For example, don't select 3 pasta dishes or 4 chicken recipes.
+Your task: Select at least 9 recipes (or all available if fewer than 9) from the provided list.
 
-Respond with ONLY a JSON array of the indices you've selected, like: [0, 5, 12, 18, 23, 27]
-Select between 5-10 recipes."""
+Selection strategy (smart 70% + random 30%):
+- SMART SELECTION (~7 recipes): Maximize variety in:
+  * Cuisine types (Italian, Asian, Mexican, American, Mediterranean, etc.)
+  * Protein sources (chicken, beef, fish, vegetarian, vegan)
+  * Cooking times (quick 15-30min meals AND elaborate 60+ min dishes)
+  * Dish types (soups, salads, mains, sides, appetizers)
+  * Respect all dietary restrictions and preferences
 
-    user_prompt = f"Here are the recipes to choose from:\n\n{recipe_summaries}\n\nSelect 5-10 diverse recipes and return their indices as a JSON array."
+- RANDOM ELEMENT (~2-3 recipes): Include some unexpected but valid options for discovery
+  * Pick interesting/unusual recipes that still meet dietary needs
+  * Add element of surprise and variety
+
+IMPORTANT:
+- Select AT LEAST 9 recipes (if available)
+- If there are fewer than 9 recipes total, select ALL of them
+- Avoid selecting very similar recipes (e.g., don't pick 4 pasta dishes)
+
+Respond with ONLY a JSON array of indices, like: [0, 3, 5, 8, 12, 15, 18, 21, 25]"""
+
+    user_prompt = f"Here are {len(recipe_summaries)} recipes to choose from:\n\n{json.dumps(recipe_summaries, indent=2)}\n\nSelect at least 9 diverse recipes (or all if fewer than 9) and return their indices as a JSON array."
 
     try:
         messages = [
@@ -70,8 +119,12 @@ Select between 5-10 recipes."""
         response = llm.invoke(messages)
         content = response.content.strip()
 
-        # Parse the indices from response
-        import json
+        # Parse indices
+        # Handle if response is wrapped in ```json``` tags
+        if "```json" in content:
+            content = content.split("```json")[1].split("```")[0].strip()
+        elif "```" in content:
+            content = content.split("```")[1].split("```")[0].strip()
 
         selected_indices = json.loads(content)
 
@@ -81,37 +134,42 @@ Select between 5-10 recipes."""
             if 0 <= idx < len(all_recipes):
                 selected.append(all_recipes[idx])
 
-        # Ensure we have at least 5 and at most 10
-        if len(selected) < 5:
-            # Fall back to random selection
-            selected = random.sample(all_recipes, min(5, len(all_recipes)))
-        elif len(selected) > 10:
-            selected = selected[:10]
+        # Ensure we have at least 9 (or all if fewer available)
+        min_required = min(9, len(all_recipes))
+        if len(selected) < min_required:
+            print(f"Agent selected only {len(selected)} recipes, falling back to random selection")
+            # Fall back: add random recipes to reach 9
+            remaining_indices = [i for i in range(len(all_recipes)) if i not in selected_indices]
+            needed = min_required - len(selected)
+            if needed > 0 and remaining_indices:
+                additional = random.sample(remaining_indices, min(needed, len(remaining_indices)))
+                selected.extend([all_recipes[i] for i in additional])
 
         state["selected_recipes"] = selected
+        print(f"Agent selected {len(selected)} recipes")
 
     except Exception as e:
         print(f"Error in agent selection: {e}")
-        # Fallback: randomly select 5-10 recipes
-        num_to_select = random.randint(5, min(10, len(all_recipes)))
+        # Fallback: randomly select 9 recipes (or all if fewer)
+        num_to_select = min(9, len(all_recipes))
         state["selected_recipes"] = random.sample(all_recipes, num_to_select)
 
     return state
 
 
-def handle_chat_refinement(state: GraphState) -> GraphState:
+async def handle_chat_refinement(state: GraphState) -> GraphState:
     """
     Agent node that processes user chat messages and refines recipe selection.
 
-    The agent can:
-    - Filter existing recipes based on feedback
-    - Decide to re-search with modified parameters
-    - Explain why certain recipes were selected
+    The agent detects user intent:
+    - "change_recipes": Re-search with new parameters (e.g., "no fish", "easier recipes")
+    - "filter": Filter existing recipes (e.g., "show only Italian")
+    - "question": Just answer without changing recipes (e.g., "how do I cook this?")
     """
     current_message = state.get("current_message", "")
     chat_history = state.get("chat_history", [])
-    all_recipes = state.get("all_recipes", [])
     selected_recipes = state.get("selected_recipes", [])
+    family_info = state.get("family_members_info", "")
 
     if not current_message:
         return state
@@ -119,40 +177,56 @@ def handle_chat_refinement(state: GraphState) -> GraphState:
     # Initialize LLM
     llm = ChatOpenAI(model=settings.OPENAI_MODEL, temperature=0.7)
 
-    # Build context
+    # Build context with current recipes
     recipe_summaries = [
         {
+            "index": i,
             "name": r.get("label", ""),
             "cuisine": r.get("cuisineType", []),
             "dish_type": r.get("dishType", []),
             "calories": r.get("calories", 0),
             "time": r.get("totalTime", 0),
         }
-        for r in all_recipes
+        for i, r in enumerate(selected_recipes)
     ]
 
-    system_prompt = """You are a helpful meal planning assistant. The user has received recipe suggestions and wants to refine them.
+    system_prompt = f"""You are a helpful meal planning assistant. The user is chatting about their recipe suggestions.
 
-You can:
-1. Filter existing recipes based on their preferences (e.g., "show me only quick meals", "I want Italian food")
-2. Suggest re-searching with different parameters (e.g., "make it healthier", "I want vegetarian options")
-3. Explain why certain recipes were selected
+{family_info}
 
-Analyze the user's message and decide on an action. Respond in JSON format:
-{
-    "action": "filter" or "re_search" or "explain",
-    "response": "Your message to the user",
-    "selected_indices": [list of indices if action is filter],
-    "new_parameters": {optional new search parameters if re_search}
-}"""
+Current selected recipes: {len(selected_recipes)} recipes
 
-    user_prompt = f"""Current recipes: {recipe_summaries}
+Analyze the user's message and detect their intent:
+
+1. "change_recipes" - User wants DIFFERENT recipes (trigger re-search):
+   Examples: "no fish", "I don't like broccoli", "make it healthier", "easier recipes", "more protein", "I hate pasta"
+
+2. "filter" - User wants to FILTER current recipes (no re-search):
+   Examples: "show only Italian", "which ones are vegetarian", "show me the quick meals"
+
+3. "question" - User is asking a QUESTION (no changes):
+   Examples: "how do I cook this?", "what's in dish #3?", "tell me about the pasta", "why did you choose these?"
+
+Respond in JSON format:
+{{
+    "intent": "change_recipes" or "filter" or "question",
+    "response": "Your helpful message to the user",
+    "selected_indices": [indices if filtering],
+    "search_params": {{health_labels: [], excluded: [], query: ""}} if re-searching
+}}
+
+IMPORTANT:
+- Only use "change_recipes" if user explicitly wants different/new recipes
+- Use "question" if user is just asking about existing recipes
+- Use "filter" to narrow down current selection"""
+
+    user_prompt = f"""Current recipes: {json.dumps(recipe_summaries, indent=2)}
 
 User message: "{current_message}"
 
-Previous chat: {chat_history[-4:] if len(chat_history) > 0 else "None"}
+Recent chat: {chat_history[-3:] if len(chat_history) > 0 else "None"}
 
-Decide how to respond and what action to take."""
+What is the user's intent and how should I respond?"""
 
     try:
         messages = [
@@ -163,30 +237,60 @@ Decide how to respond and what action to take."""
         response = llm.invoke(messages)
         content = response.content.strip()
 
-        import json
+        # Handle JSON extraction
+        if "```json" in content:
+            content = content.split("```json")[1].split("```")[0].strip()
+        elif "```" in content:
+            content = content.split("```")[1].split("```")[0].strip()
 
         agent_decision = json.loads(content)
 
-        action = agent_decision.get("action", "explain")
+        intent = agent_decision.get("intent", "question")
         agent_response = agent_decision.get("response", "I understand your request.")
 
-        state["action"] = action
         state["agent_response"] = agent_response
 
-        if action == "filter" and "selected_indices" in agent_decision:
-            # Filter existing recipes
-            indices = agent_decision["selected_indices"]
-            new_selected = [all_recipes[i] for i in indices if 0 <= i < len(all_recipes)]
-            state["selected_recipes"] = new_selected if new_selected else selected_recipes
+        if intent == "change_recipes":
+            # User wants different recipes - trigger re-search
+            print(f"User wants different recipes: {current_message}")
+            state["action"] = "re_search"
 
-        elif action == "re_search":
-            # Mark that we need to re-search
-            # The API endpoint will handle calling Edamam again
+            # Clear recipes to force re-search
+            state["all_recipes"] = []
             state["selected_recipes"] = []
+
+            # Extract search parameters if provided
+            search_params = agent_decision.get("search_params", {})
+            if search_params:
+                # Update state with new search parameters
+                if "health_labels" in search_params:
+                    state["diet_labels"] = search_params["health_labels"]
+                if "excluded" in search_params:
+                    # Merge with existing excluded ingredients
+                    existing = state.get("excluded_ingredients", [])
+                    new_excluded = search_params["excluded"]
+                    state["excluded_ingredients"] = list(set(existing + new_excluded))
+
+        elif intent == "filter":
+            # Filter existing recipes
+            print(f"Filtering existing recipes: {current_message}")
+            state["action"] = "filter"
+
+            indices = agent_decision.get("selected_indices", [])
+            if indices:
+                new_selected = [selected_recipes[i] for i in indices if 0 <= i < len(selected_recipes)]
+                if new_selected:
+                    state["selected_recipes"] = new_selected
+
+        else:  # question
+            # Just answer - no changes to recipes
+            print(f"User asked a question: {current_message}")
+            state["action"] = "question"
+            # Keep recipes as-is
 
     except Exception as e:
         print(f"Error in chat refinement: {e}")
-        state["action"] = "no_change"
-        state["agent_response"] = "I understand. Let me keep the current selection for now."
+        state["action"] = "question"
+        state["agent_response"] = "I understand. Let me help you with that."
 
     return state

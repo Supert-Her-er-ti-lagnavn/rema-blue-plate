@@ -11,11 +11,15 @@ import Index from "./pages/Index";
 import ShoppingPage from "./pages/ShoppingPage";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import { ShoppingProvider } from "@/contexts/ShoppingContext";
 import { PreferencesProvider } from "@/contexts/PreferencesContext";
 import { FridgeMode } from '@/components/FridgeMode';
 import { NotificationProvider } from '@/contexts/NotificationContext';
+import { AuthProvider } from '@/contexts/AuthContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 const queryClient = new QueryClient();
 
@@ -27,33 +31,56 @@ const AppContent: React.FC<{
   const hideToggle =
     location.pathname.startsWith('/notifications') ||
     location.pathname.startsWith('/settings') ||
-    location.pathname.startsWith('/profile');
+    location.pathname.startsWith('/profile') ||
+    location.pathname.startsWith('/login') ||
+    location.pathname.startsWith('/register');
 
   return (
     <>
       {/* Cross-state Header - appears on all pages */}
       <Header />
       <Routes>
+        {/* Public routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        {/* Protected routes */}
         <Route
           path="/"
           element={
-            currentMode === 'shopping' ? (
-              <ShoppingPage />
-            ) : currentMode === 'fridge' ? (
-              <FridgeMode />
-            ) : (
-              <Index currentMode={currentMode} />
-            )
+            <ProtectedRoute>
+              {currentMode === 'shopping' ? (
+                <ShoppingPage />
+              ) : currentMode === 'fridge' ? (
+                <FridgeMode />
+              ) : (
+                <Index currentMode={currentMode} />
+              )}
+            </ProtectedRoute>
           }
         />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/notifications" element={<Notifications />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <Notifications />
+            </ProtectedRoute>
+          }
+        />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {/* Global Chat Widget - appears on all pages */}
-      <ChatWidget />
-      {/* Sticky Toggle at Bottom - appears on all pages except Notifications/Settings/Profile */}
+      {/* Global Chat Widget - appears on protected pages only */}
+      {!hideToggle && <ChatWidget />}
+      {/* Sticky Toggle at Bottom - appears on protected pages only */}
       {!hideToggle && <SegmentedToggle onToggle={onToggle} />}
     </>
   );
@@ -69,19 +96,21 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <PreferencesProvider>
-        <ShoppingProvider>
-          <NotificationProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <AppContent currentMode={currentMode} onToggle={handleModeToggle} />
-              </BrowserRouter>
-            </TooltipProvider>
-          </NotificationProvider>
-        </ShoppingProvider>
-      </PreferencesProvider>
+      <AuthProvider>
+        <PreferencesProvider>
+          <ShoppingProvider>
+            <NotificationProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <AppContent currentMode={currentMode} onToggle={handleModeToggle} />
+                </BrowserRouter>
+              </TooltipProvider>
+            </NotificationProvider>
+          </ShoppingProvider>
+        </PreferencesProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };

@@ -11,10 +11,12 @@ class GraphState(TypedDict):
     diet_labels: List[str]
     excluded_ingredients: List[str]
     fridge_items: List[str]
+    custom_preferences: List[str]  # User's free-text preferences for AI
+    family_members_info: str  # Formatted string with family member preferences for agent prompt
 
     # Recipes data
-    all_recipes: List[dict]  # All recipes from Edamam
-    selected_recipes: List[dict]  # Agent-selected recipes
+    all_recipes: List[dict]  # All recipes from Edamam (populated by agent)
+    selected_recipes: List[dict]  # Agent-selected recipes (9+ diverse options)
 
     # Chat interaction
     chat_history: List[dict]

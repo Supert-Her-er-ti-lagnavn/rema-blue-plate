@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, Users, Plus, Check } from "lucide-react";
 import { useShoppingContext } from "@/contexts/useShoppingContext";
+import { useShoppingList } from "@/hooks/useShoppingList";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useNotification } from "@/contexts/NotificationContext";
@@ -23,45 +24,71 @@ interface MealCardProps {
   totalCost: number;
   mealIndex?: number;
   handleAddMeal?: () => void;
+  recipeUri?: string;
+  sessionId?: string | null;
 }
 
 
-export const MealCard = ({ title, image, prepTime, servings, ingredients, totalCost, mealIndex, handleAddMeal }: MealCardProps) => {
+export const MealCard = ({
+  title,
+  image,
+  prepTime,
+  servings,
+  ingredients,
+  totalCost,
+  mealIndex,
+  handleAddMeal,
+  recipeUri,
+  sessionId
+}: MealCardProps) => {
   const { addItemsToShoppingList } = useShoppingContext();
+  const { addRecipe } = useShoppingList();
   const { showFridgeNotification } = useNotification();
   const [isAdding, setIsAdding] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
 
   // Wrap handler to always trigger animations
-  const onAdd = () => {
+  const onAdd = async () => {
     setIsAdding(true);
-    
-    if (handleAddMeal) {
-      // Use custom handler (for fridge logic)
-      handleAddMeal();
-    } else {
-      // Default handler
-      addItemsToShoppingList(
-        ingredients.map((ing, i) => ({
-          id: Number(`${mealIndex || 0}${i + 1}${ing.name.length}${title.length}${Date.now()}`),
-          name: ing.name,
-          quantity: parseInt(ing.amount) || 1,
-          category: "",
-          aisle: 1,
-          checked: false,
-          price: ing.price,
-          mealId: mealIndex || 0,
-        }))
-      );
-    }
 
-    showFridgeNotification();
+    try {
+      // If we have recipeUri and sessionId, use backend
+      if (recipeUri && sessionId) {
+        await addRecipe.mutateAsync({
+          recipeUri,
+          sessionId,
+        });
+      } else if (handleAddMeal) {
+        // Use custom handler (for fridge logic with sample meals)
+        handleAddMeal();
+      } else {
+        // Default handler for sample meals
+        addItemsToShoppingList(
+          ingredients.map((ing, i) => ({
+            id: Number(`${mealIndex || 0}${i + 1}${ing.name.length}${title.length}${Date.now()}`),
+            name: ing.name,
+            quantity: parseInt(ing.amount) || 1,
+            category: "",
+            aisle: 1,
+            checked: false,
+            price: ing.price,
+            mealId: mealIndex || 0,
+          }))
+        );
+        toast.success('Recipe added to shopping list!');
+      }
 
-    setTimeout(() => {
+      showFridgeNotification();
+
+      setTimeout(() => {
+        setIsAdding(false);
+        setJustAdded(true);
+        setTimeout(() => setJustAdded(false), 1000);
+      }, 300);
+    } catch (error) {
       setIsAdding(false);
-      setJustAdded(true);
-      setTimeout(() => setJustAdded(false), 1000);
-    }, 300);
+      // Error toast is already handled in useShoppingList
+    }
   };
 
   return (

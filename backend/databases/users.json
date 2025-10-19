@@ -4,91 +4,215 @@
       "id": 1,
       "name": "Anna Hansen",
       "email": "anna.hansen@example.com",
-      "family": [2, 3, 4],
-      "dietLabels": ["vegetarian", "dairy-free"],
-      "customPreferences": ["broccoli", "brussels sprouts", "garlic"],
-      "fridge": []
+      "family": [
+        2,
+        3,
+        4
+      ],
+      "dietLabels": [
+        "vegetarian",
+        "dairy-free"
+      ],
+      "customPreferences": [
+        "broccoli",
+        "brussels sprouts",
+        "garlic"
+      ],
+      "fridge": [],
+      "shopping_list": []
     },
     {
       "id": 2,
       "name": "Jonas Hansen",
       "email": "jonas.hansen@example.com",
-      "family": [1, 3, 4],
+      "family": [
+        1,
+        3,
+        4
+      ],
       "dietLabels": [],
-      "customPreferences": ["shrimp", "shellfish", "beets"],
-      "fridge": []
+      "customPreferences": [
+        "shrimp",
+        "shellfish",
+        "beets"
+      ],
+      "fridge": [],
+      "shopping_list": []
     },
     {
       "id": 3,
       "name": "Emma Hansen",
       "email": "emma.hansen@example.com",
-      "family": [1, 2, 4],
-      "dietLabels": ["peanut-free", "tree-nut-free"],
-      "customPreferences": ["peanut butter", "almonds", "hazelnuts", "walnuts"],
-      "fridge": []
+      "family": [
+        1,
+        2,
+        4
+      ],
+      "dietLabels": [
+        "peanut-free",
+        "tree-nut-free"
+      ],
+      "customPreferences": [
+        "peanut butter",
+        "almonds",
+        "hazelnuts",
+        "walnuts"
+      ],
+      "fridge": [],
+      "shopping_list": []
     },
     {
       "id": 4,
       "name": "Oliver Hansen",
       "email": "oliver.hansen@example.com",
-      "family": [1, 2, 3],
-      "dietLabels": ["gluten-free"],
-      "customPreferences": ["spaghetti", "pasta", "bread"],
-      "fridge": []
+      "family": [
+        1,
+        2,
+        3
+      ],
+      "dietLabels": [
+        "gluten-free"
+      ],
+      "customPreferences": [
+        "spaghetti",
+        "pasta",
+        "bread"
+      ],
+      "fridge": [],
+      "shopping_list": []
     },
     {
       "id": 5,
       "name": "Sara Berg",
       "email": "sara.berg@example.com",
-      "family": [6],
-      "dietLabels": ["vegan", "soy-free"],
-      "customPreferences": ["milk", "butter", "cheese", "egg"],
-      "fridge": []
+      "family": [
+        6
+      ],
+      "dietLabels": [
+        "vegan",
+        "soy-free"
+      ],
+      "customPreferences": [
+        "milk",
+        "butter",
+        "cheese",
+        "egg"
+      ],
+      "fridge": [],
+      "shopping_list": []
     },
     {
       "id": 6,
       "name": "Martin Berg",
       "email": "martin.berg@example.com",
-      "family": [5],
-      "dietLabels": ["pescatarian", "shellfish-free"],
-      "customPreferences": ["ground beef", "bacon", "ham", "shrimp"],
-      "fridge": []
+      "family": [
+        5
+      ],
+      "dietLabels": [
+        "pescatarian",
+        "shellfish-free"
+      ],
+      "customPreferences": [
+        "ground beef",
+        "bacon",
+        "ham",
+        "shrimp"
+      ],
+      "fridge": [],
+      "shopping_list": []
     },
     {
       "id": 7,
       "name": "Nora Nilsen",
       "email": "nora.nilsen@example.com",
-      "family": [8, 9],
-      "dietLabels": ["kosher", "pork-free"],
-      "customPreferences": ["bacon", "sausage", "onion"],
-      "fridge": []
+      "family": [
+        8,
+        9
+      ],
+      "dietLabels": [
+        "kosher",
+        "pork-free"
+      ],
+      "customPreferences": [
+        "bacon",
+        "sausage",
+        "onion"
+      ],
+      "fridge": [],
+      "shopping_list": []
     },
     {
       "id": 8,
       "name": "Lucas Nilsen",
       "email": "lucas.nilsen@example.com",
-      "family": [7, 9],
-      "dietLabels": ["egg-free", "dairy-free"],
-      "customPreferences": ["cucumber", "tomato", "bell pepper"],
-      "fridge": []
+      "family": [
+        7,
+        9
+      ],
+      "dietLabels": [
+        "egg-free",
+        "dairy-free"
+      ],
+      "customPreferences": [
+        "cucumber",
+        "tomato",
+        "bell pepper"
+      ],
+      "fridge": [],
+      "shopping_list": []
     },
     {
       "id": 9,
       "name": "Sofia Nilsen",
       "email": "sofia.nilsen@example.com",
-      "family": [7, 8],
+      "family": [
+        7,
+        8
+      ],
       "dietLabels": [],
-      "customPreferences": ["pineapple", "licorice", "blueberry"],
-      "fridge": []
+      "customPreferences": [
+        "pineapple",
+        "licorice",
+        "blueberry"
+      ],
+      "fridge": [],
+      "shopping_list": []
     },
     {
       "id": 10,
       "name": "Erik Johansen",
       "email": "erik.johansen@example.com",
       "family": [],
-      "dietLabels": ["keto-friendly", "low-sugar"],
-      "customPreferences": ["sugar", "rice", "pasta", "potato"],
-      "fridge": []
+      "dietLabels": [
+        "keto-friendly",
+        "low-sugar"
+      ],
+      "customPreferences": [
+        "sugar",
+        "rice",
+        "pasta",
+        "potato"
+      ],
+      "fridge": [],
+      "shopping_list": []
+    },
+    {
+      "id": 11,
+      "name": "Afras Uddin Mansoor",
+      "email": "afras@hotmail.no",
+      "family": [
+        5
+      ],
+      "dietLabels": [
+        "balanced",
+        "alcohol-free",
+        "mollusk-free"
+      ],
+      "customPreferences": [
+        "er allergisk mot nøtter."
+      ],
+      "fridge": [],
+      "shopping_list": []
     }
   ]
 }

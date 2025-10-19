@@ -1,9 +1,12 @@
-
 import React from 'react';
-import { MealCard } from "@/components/MealCard";
-import { ShoppingList } from "@/components/ShoppingList";
-import { useShoppingContext } from "@/contexts/useShoppingContext";
-import { sampleMeals } from "@/components/sampleMeals";
+import { MealCard } from '@/components/MealCard';
+import { MealPlanningLayout } from '@/components/MealPlanningLayout';
+import { FamilySelector } from '@/components/FamilySelector';
+import { ShoppingListPreview } from '@/components/ShoppingListPreview';
+import { ChatPanel } from '@/components/ChatPanel';
+import { useRecipeSearch } from '@/hooks/useRecipeSearch';
+import { sampleMeals } from '@/components/sampleMeals';
+import { Loader2 } from 'lucide-react';
 
 export interface Meal {
   title: string;
@@ -19,86 +22,109 @@ export interface Meal {
 }
 
 export const MealPlanningMode: React.FC = () => {
-  const { addItemsToShoppingList } = useShoppingContext();
+  const {
+    sessionId,
+    recipes,
+    isLoading,
+    searchRecipes,
+    updateRecipes,
+  } = useRecipeSearch();
 
-
-  // Utility to filter fridge items and update fridge
-  const filterIngredientsWithFridge = (ingredients: { name: string; amount: string; price: number; }[]) => {
-    // Get fridge items from localStorage (array of { name: string })
-    const fridgeItems: { name: string }[] = JSON.parse(localStorage.getItem('fridgeItems') || '[]');
-    // Lowercase names for comparison
-    const fridgeItemNames = fridgeItems.map(item => item.name.trim().toLowerCase());
-    // Track which fridge items are used
-    const usedFromFridge: string[] = [];
-    // Only add ingredients not in fridge
-    const neededIngredients = ingredients.filter(ingredient => {
-      const name = ingredient.name.trim().toLowerCase();
-      const isInFridge = fridgeItemNames.includes(name);
-      if (isInFridge) usedFromFridge.push(name);
-      return !isInFridge;
-    });
-    // Remove used items from fridge
-    if (usedFromFridge.length > 0) {
-      const updatedFridge = fridgeItems.filter(item => !usedFromFridge.includes(item.name.trim().toLowerCase()));
-      localStorage.setItem('fridgeItems', JSON.stringify(updatedFridge));
-    }
-    return neededIngredients;
+  const handleSearch = async (selectedUserIds: number[]) => {
+    await searchRecipes(selectedUserIds);
   };
 
-  // Handler to add meal, using fridge logic
-  const handleAddMeal = (meal: Meal, mealIndex: number) => {
-    const neededIngredients = filterIngredientsWithFridge(meal.ingredients);
-    if (neededIngredients.length > 0) {
-      // Generate unique ID using timestamp to allow same meal multiple times
-      const timestamp = Date.now();
-      addItemsToShoppingList(
-        neededIngredients.map((ing, i) => ({
-          id: Number(`${timestamp}${mealIndex}${i}`),
-          name: ing.name,
-          quantity: parseInt(ing.amount) || 1,
-          category: "",
-          aisle: 1,
-          checked: false,
-          price: ing.price,
-          mealId: Number(`${timestamp}${mealIndex}`),
-        }))
-      );
-    }
+  const handleRecipesUpdate = (newRecipes: any[]) => {
+    updateRecipes(newRecipes);
   };
+
+  // Use backend recipes if available, otherwise show sample meals as default
+  const displayRecipes = recipes.length > 0 ? recipes : sampleMeals;
+  const isBackendRecipes = recipes.length > 0;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 py-8 pb-24 space-y-16">
-        {/* SECTION 1: MODE HEADER */}
-        <section>
-          <div className="text-center mb-8">
+    <MealPlanningLayout
+      leftPanel={
+        <>
+          <FamilySelector onSearch={handleSearch} isSearching={isLoading} />
+          <div className="border-t pt-4">
+            <ShoppingListPreview />
+          </div>
+        </>
+      }
+      mainContent={
+        <div className="space-y-6">
+          <div className="text-center">
             <h2 className="text-3xl font-black text-foreground mb-2 uppercase tracking-tight">
-              📅 Meal Planning
+              📅 {isBackendRecipes ? 'AI-Selected Recipes' : 'Sample Recipes'}
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Plan your weekly meals and discover new recipes
+              {isBackendRecipes
+                ? 'These recipes match your family\'s preferences'
+                : 'Select family members and search to get personalized recipes'}
             </p>
           </div>
-        </section>
 
-        {/* SECTION 2: SHOPPING LIST - Now context-driven */}
-        <section>
-          <ShoppingList />
-        </section>
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="w-12 h-12 animate-spin text-blue-600 mb-4" />
+              <p className="text-gray-600 font-medium">Searching recipes...</p>
+              <p className="text-sm text-gray-500 mt-2">
+                AI is selecting the best recipes for you
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {isBackendRecipes
+                ? recipes.map((recipe, index) => (
+                    <MealCard
+                      key={recipe.uri}
+                      title={recipe.label}
+                      image={recipe.image}
+                      prepTime={recipe.totalTime || 30}
+                      servings={recipe.yield_servings || 4}
+                      totalCost={recipe.ingredientLines.length * 20} // Mock cost
+                      ingredients={recipe.ingredientLines.map((line, idx) => ({
+                        name: line,
+                        amount: "1",
+                        price: 20,
+                      }))}
+                      mealIndex={index + 1}
+                      handleAddMeal={() => {}}
+                      recipeUri={recipe.uri}
+                      sessionId={sessionId}
+                    />
+                  ))
+                : sampleMeals.map((meal, index) => (
+                    <MealCard
+                      key={index}
+                      {...meal}
+                      mealIndex={index + 1}
+                      handleAddMeal={() => {}}
+                      sessionId={null}
+                    />
+                  ))}
+            </div>
+          )}
 
-        {/* SECTION 4: POPULAR RECIPES - Add to shopping list via context and fridge logic */}
-        <section>
-          <h2 className="text-3xl font-black text-foreground mb-8 uppercase tracking-tight">
-            Popular Recipes
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sampleMeals.map((meal, index) => (
-              <MealCard key={index} {...meal} mealIndex={index + 1} handleAddMeal={() => handleAddMeal(meal, index + 1)} />
-            ))}
-          </div>
-        </section>
-      </div>
-    </div>
+          {!isBackendRecipes && !isLoading && (
+            <div className="text-center py-8 bg-blue-50 rounded-lg border border-blue-200">
+              <p className="text-blue-900 font-medium mb-2">
+                👈 Select your family and search for personalized recipes!
+              </p>
+              <p className="text-blue-700 text-sm">
+                AI will find recipes matching everyone's dietary preferences
+              </p>
+            </div>
+          )}
+        </div>
+      }
+      rightPanel={
+        <ChatPanel
+          sessionId={sessionId}
+          onRecipesUpdate={handleRecipesUpdate}
+        />
+      }
+    />
   );
 };
-

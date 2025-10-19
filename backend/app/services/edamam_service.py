@@ -9,6 +9,16 @@ from app.config import settings
 class EdamamService:
     """Service for searching recipes using Edamam API."""
 
+    # Valid Edamam health labels
+    VALID_HEALTH_LABELS = {
+        "vegan", "vegetarian", "paleo", "dairy-free", "gluten-free",
+        "wheat-free", "egg-free", "peanut-free", "tree-nut-free",
+        "soy-free", "fish-free", "shellfish-free", "pork-free",
+        "red-meat-free", "crustacean-free", "celery-free",
+        "mustard-free", "sesame-free", "lupine-free", "mollusk-free",
+        "alcohol-free", "kosher"
+    }
+
     def __init__(self):
         self.base_url = settings.EDAMAM_BASE_URL
         self.app_id = settings.EDAMAM_APP_ID
@@ -46,10 +56,21 @@ class EdamamService:
             ("to", str(max_results)),
         ]
 
-        # Add health labels as multiple params
+        # Add health labels as multiple params (filter out invalid labels)
+        valid_labels_count = 0
         if health_labels:
             for label in health_labels:
-                params.append(("health", label))
+                # Only add valid health labels
+                if label.lower() in self.VALID_HEALTH_LABELS:
+                    params.append(("health", label))
+                    valid_labels_count += 1
+                else:
+                    print(f"Warning: Skipping invalid health label: {label}")
+
+        # If no valid health labels, add a default search query to get general recipes
+        if health_labels and valid_labels_count == 0:
+            print("Warning: No valid health labels found. Searching for general recipes.")
+            params.append(("q", "dinner"))
 
         # Add excluded ingredients as multiple params
         if excluded:
@@ -78,6 +99,7 @@ class EdamamService:
                         image=recipe_data.get("image", ""),
                         source=recipe_data.get("source", ""),
                         url=recipe_data.get("url", ""),
+                        yield_servings=recipe_data.get("yield", 4),
                         ingredientLines=recipe_data.get("ingredientLines", []),
                         calories=recipe_data.get("calories", 0),
                         totalTime=recipe_data.get("totalTime", 0),

@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import users, recipes, agent
+from app.api import shopping
 from app.config import settings
 
 
@@ -45,6 +46,7 @@ app.add_middleware(
 app.include_router(users.router, prefix="/api/users", tags=["users"])
 app.include_router(recipes.router, prefix="/api/recipes", tags=["recipes"])
 app.include_router(agent.router, prefix="/api/agent", tags=["agent"])
+app.include_router(shopping.router, prefix="/api/shopping", tags=["shopping"])
 
 
 @app.get("/")

@@ -8,27 +8,36 @@ from langchain.tools import tool
 async def search_edamam_recipes(
     health_labels: Optional[List[str]] = None,
     excluded: Optional[List[str]] = None,
-    included: Optional[List[str]] = None,
+    query: Optional[str] = None,
     max_results: int = 30,
 ) -> List[dict]:
     """
     Search for recipes using the Edamam Recipe API.
 
+    This tool allows you to search for recipes based on health restrictions,
+    excluded ingredients, and general search queries. You have full control
+    over search parameters to find the best recipes for the users.
+
     Args:
-        health_labels: List of health labels like ["vegan", "dairy-free"]
-        excluded: List of ingredients to exclude
-        included: List of ingredients to include in search
+        health_labels: List of health labels like ["vegan", "dairy-free", "gluten-free"]
+        excluded: List of ingredients to exclude (e.g., ["fish", "nuts"])
+        query: General search query (e.g., "pasta", "chicken curry", "quick meals")
         max_results: Maximum number of results (default 30)
 
     Returns:
-        List of recipe dictionaries
+        List of recipe dictionaries with full details (ingredients, nutrition, etc.)
+
+    Examples:
+        - search_edamam_recipes(health_labels=["vegan"], query="pasta")
+        - search_edamam_recipes(excluded=["fish", "shellfish"], max_results=30)
+        - search_edamam_recipes(health_labels=["gluten-free"], query="dessert")
     """
     from app.services.edamam_service import edamam_service
 
     recipes = await edamam_service.search_recipes(
-        health_labels=health_labels,
-        excluded=excluded,
-        included=included,
+        health_labels=health_labels or [],
+        excluded=excluded or [],
+        query=query,
         max_results=max_results,
     )
 

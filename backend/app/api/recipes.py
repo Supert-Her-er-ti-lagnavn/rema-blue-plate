@@ -19,45 +19,43 @@ router = APIRouter()
 @router.post("/search", response_model=RecipeSearchResponse)
 async def search_recipes(request: RecipeSearchRequest):
     """
-    Search for recipes based on user dietary preferences.
+    Search for recipes using AI agent.
 
-    Takes a list of user IDs, merges their dietary preferences and exclusions,
-    searches Edamam API for 30 recipes, then uses the AI agent to select
-    5-10 diverse recipes.
+    The agent receives family member preferences, searches Edamam API directly,
+    and selects 9+ diverse recipes with smart variety (70%) + random discovery (30%).
 
-    Returns the selected recipes and a session ID for accessing all results.
+    Returns the selected recipes and a session ID for chat refinement.
     """
     # Merge preferences from all users
     merged_prefs = user_service.merge_preferences(request.user_ids)
 
-    # Search Edamam API
-    try:
-        all_recipes = await edamam_service.search_recipes(
-            health_labels=merged_prefs.diet_labels,
-            excluded=merged_prefs.excluded_ingredients,
-            max_results=settings.MAX_RECIPES_FETCH,
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Error searching Edamam API: {str(e)}"
-        )
+    # Format family member preferences for agent prompt
+    family_info_parts = []
+    family_info_parts.append("You are helping plan meals for:")
 
-    if not all_recipes:
-        raise HTTPException(
-            status_code=404,
-            detail="No recipes found matching the dietary preferences",
-        )
+    for user_id in request.user_ids:
+        user = user_service.get_user(user_id)
+        if user:
+            # Format: "- Name (diet labels): custom preferences"
+            diet_str = ", ".join(user.dietLabels) if user.dietLabels else "no restrictions"
+            custom_str = ", ".join(user.customPreferences) if user.customPreferences else ""
 
-    # Convert recipes to dict for agent
-    all_recipes_dict = [recipe.model_dump() for recipe in all_recipes]
+            if custom_str:
+                family_info_parts.append(f"- {user.name} ({diet_str}): \"{custom_str}\"")
+            else:
+                family_info_parts.append(f"- {user.name} ({diet_str})")
 
-    # Use agent to select diverse recipes
+    family_members_info = "\n".join(family_info_parts)
+
+    # Agent will search Edamam API - pass empty recipes list
     initial_state = {
         "user_ids": request.user_ids,
         "diet_labels": merged_prefs.diet_labels,
         "excluded_ingredients": merged_prefs.excluded_ingredients,
         "fridge_items": merged_prefs.fridge_items,
-        "all_recipes": all_recipes_dict,
+        "custom_preferences": merged_prefs.custom_preferences,
+        "family_members_info": family_members_info,
+        "all_recipes": [],  # Agent will populate this
         "selected_recipes": [],
         "chat_history": [],
         "current_message": None,
@@ -65,12 +63,21 @@ async def search_recipes(request: RecipeSearchRequest):
         "agent_response": None,
     }
 
-    # Run the agent graph
-    result = graph.invoke(initial_state)
-    selected_recipes_dict = result["selected_recipes"]
+    # Run the agent graph (agent searches and selects)
+    result = await graph.ainvoke(initial_state)
 
-    # Convert back to Pydantic models
+    selected_recipes_dict = result.get("selected_recipes", [])
+    all_recipes_dict = result.get("all_recipes", [])
+
+    if not selected_recipes_dict:
+        raise HTTPException(
+            status_code=404,
+            detail="No recipes found matching the dietary preferences",
+        )
+
+    # Convert to Pydantic models
     selected_recipes = [EdamamRecipe(**r) for r in selected_recipes_dict]
+    all_recipes = [EdamamRecipe(**r) for r in all_recipes_dict]
 
     # Create session
     session_id = session_service.create_session(
@@ -82,8 +89,9 @@ async def search_recipes(request: RecipeSearchRequest):
 
     return RecipeSearchResponse(
         session_id=session_id,
-        recipes=selected_recipes,
-        total_found=len(all_recipes),
+        selected_recipes=selected_recipes,
+        search_results=all_recipes,
+        merged_preferences=merged_prefs.model_dump(),
     )
 
 

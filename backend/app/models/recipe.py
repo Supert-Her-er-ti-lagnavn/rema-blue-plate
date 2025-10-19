@@ -12,6 +12,7 @@ class EdamamRecipe(BaseModel):
     image: HttpUrl
     source: str
     url: HttpUrl
+    yield_servings: int = 4  # Number of servings (renamed to avoid Python keyword)
     ingredientLines: List[str]
     calories: float
     totalTime: float
@@ -31,8 +32,9 @@ class RecipeSearchResponse(BaseModel):
     """Response model for recipe search."""
 
     session_id: str
-    recipes: List[EdamamRecipe]
-    total_found: int
+    selected_recipes: List[EdamamRecipe]
+    search_results: List[EdamamRecipe]
+    merged_preferences: dict
 
 
 class AllRecipesResponse(BaseModel):
