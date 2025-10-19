@@ -11,6 +11,7 @@ export interface ShoppingItem {
   checked: boolean;
   price: number;
   mealId?: number;
+  mealTitle?: string;
   x_position?: number;
   y_position?: number;
 }

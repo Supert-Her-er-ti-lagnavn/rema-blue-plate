@@ -61,6 +61,7 @@ export const MealPlanningMode: React.FC = () => {
           checked: false,
           price: ing.price,
           mealId: Number(`${timestamp}${mealIndex}`),
+          mealTitle: meal.title,
         }))
       );
     }

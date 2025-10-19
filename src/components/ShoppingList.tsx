@@ -103,12 +103,10 @@ export const ShoppingList = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Group items by mealId and show meal name if available */}
+          {/* Group items by mealTitle */}
           {Object.entries(
             shoppingList.reduce((acc, item) => {
-              const key = item.mealId
-                ? sampleMeals[item.mealId - 1]?.title || `Meal ${item.mealId}`
-                : 'Other';
+              const key = item.mealTitle || 'Other';
               if (!acc[key]) acc[key] = [];
               acc[key].push(item);
               return acc;
