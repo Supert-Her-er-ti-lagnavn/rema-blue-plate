@@ -115,9 +115,24 @@ export const ShoppingList = () => {
             }, {} as Record<string, typeof shoppingList>)
           ).map(([group, items]) => (
             <div key={group} className="space-y-2">
-              <h4 className="font-black text-foreground uppercase text-sm flex items-center gap-2">
-                {group}
-              </h4>
+              <div className="flex items-center justify-between">
+                <h4 className="font-black text-foreground uppercase text-sm flex items-center gap-2">
+                  {group}
+                </h4>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    items.forEach(item => removeItemFromList(item.id));
+                    toast.success(`Removed all items from ${group}`);
+                  }}
+                  className="h-6 px-2 text-xs hover:bg-red-100 hover:text-red-600"
+                  title={`Remove all items from ${group}`}
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  Remove all
+                </Button>
+              </div>
               {items.map(item => (
                 <div key={item.id} className={`flex justify-between items-center p-3 rounded-lg border group ${item.checked ? 'bg-green-100 border-green-400' : 'bg-secondary border-border'}`}>
                   <div className="flex-1">
@@ -144,8 +159,11 @@ export const ShoppingList = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => removeItemFromList(item.id)}
-                      title="Remove"
+                      onClick={() => {
+                        removeItemFromList(item.id);
+                      }}
+                      title="Remove item"
+                      className="hover:bg-red-100 hover:text-red-600"
                     >
                       <X className="h-4 w-4" />
                     </Button>

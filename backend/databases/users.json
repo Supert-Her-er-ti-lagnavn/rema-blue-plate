@@ -19,7 +19,7 @@
         "garlic"
       ],
       "fridge": [],
-      "shopping_list": []
+      "shopping_list": {}
     },
     {
       "id": 2,
@@ -37,7 +37,7 @@
         "beets"
       ],
       "fridge": [],
-      "shopping_list": []
+      "shopping_list": {}
     },
     {
       "id": 3,
@@ -59,7 +59,7 @@
         "walnuts"
       ],
       "fridge": [],
-      "shopping_list": []
+      "shopping_list": {}
     },
     {
       "id": 4,
@@ -79,7 +79,7 @@
         "bread"
       ],
       "fridge": [],
-      "shopping_list": []
+      "shopping_list": {}
     },
     {
       "id": 5,
@@ -99,7 +99,7 @@
         "egg"
       ],
       "fridge": [],
-      "shopping_list": []
+      "shopping_list": {}
     },
     {
       "id": 6,
@@ -119,7 +119,7 @@
         "shrimp"
       ],
       "fridge": [],
-      "shopping_list": []
+      "shopping_list": {}
     },
     {
       "id": 7,
@@ -139,7 +139,7 @@
         "onion"
       ],
       "fridge": [],
-      "shopping_list": []
+      "shopping_list": {}
     },
     {
       "id": 8,
@@ -159,7 +159,7 @@
         "bell pepper"
       ],
       "fridge": [],
-      "shopping_list": []
+      "shopping_list": {}
     },
     {
       "id": 9,
@@ -176,7 +176,7 @@
         "blueberry"
       ],
       "fridge": [],
-      "shopping_list": []
+      "shopping_list": {}
     },
     {
       "id": 10,
@@ -194,7 +194,7 @@
         "potato"
       ],
       "fridge": [],
-      "shopping_list": []
+      "shopping_list": {}
     },
     {
       "id": 11,
@@ -211,7 +211,14 @@
         "er allergisk mot nøtter."
       ],
       "fridge": [],
-      "shopping_list": []
+      "shopping_list": {
+        "recipes": [],
+        "manual_items": [],
+        "checked_items": [],
+        "removed_items": [
+          "tomato"
+        ]
+      }
     }
   ]
 }

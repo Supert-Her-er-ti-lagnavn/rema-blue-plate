@@ -4,6 +4,14 @@ from typing import List, Optional
 from pydantic import BaseModel, EmailStr
 
 
+class UserShoppingList(BaseModel):
+    """Shopping list data stored in user profile."""
+    recipes: List[dict] = []
+    manual_items: List[dict] = []
+    checked_items: List[str] = []
+    removed_items: List[str] = []
+
+
 class User(BaseModel):
     """User model representing a user in the system."""
 
@@ -14,7 +22,7 @@ class User(BaseModel):
     dietLabels: List[str]
     customPreferences: List[str]
     fridge: List[str] = []
-    shopping_list: List = []
+    shopping_list: dict = {}
 
 
 class FamilyMember(BaseModel):

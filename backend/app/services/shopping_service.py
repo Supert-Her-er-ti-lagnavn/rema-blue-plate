@@ -29,13 +29,75 @@ class ShoppingService:
     """Service for shopping list operations."""
 
     def __init__(self):
-        self.shopping_lists: Dict[int, ShoppingList] = {}
+        # Shopping lists are now loaded from user database
+        pass
+
+    def _load_from_user(self, user_id: int) -> ShoppingList:
+        """Load shopping list from user database."""
+        from app.services.user_service import user_service
+        from app.models.recipe import EdamamRecipe
+
+        user = user_service.get_user(user_id)
+        if not user:
+            raise ValueError("User not found")
+
+        shopping_list = ShoppingList(user_id)
+
+        # Load shopping list data from user
+        sl_data = user.shopping_list if user.shopping_list else {}
+
+        # Load recipes
+        for recipe_entry in sl_data.get("recipes", []):
+            recipe_uri = recipe_entry["recipe_uri"]
+            # Reconstruct EdamamRecipe from stored data
+            recipe = EdamamRecipe(**recipe_entry["recipe_data"])
+            shopping_list.recipes[recipe_uri] = {
+                "recipe": recipe,
+                "count": recipe_entry.get("count", 1),
+                "date_added": recipe_entry.get("date_added", datetime.now().isoformat()),
+            }
+
+        # Load manual items
+        for item_data in sl_data.get("manual_items", []):
+            shopping_list.manual_items.append(CombinedShoppingItem(**item_data))
+
+        # Load checked items
+        shopping_list.checked_items = set(sl_data.get("checked_items", []))
+
+        # Load removed items (for individual item removal from recipes)
+        shopping_list.removed_items = set(sl_data.get("removed_items", []))
+
+        return shopping_list
+
+    def _save_to_user(self, user_id: int, shopping_list: ShoppingList):
+        """Save shopping list to user database."""
+        from app.services.user_service import user_service
+
+        user = user_service.get_user(user_id)
+        if not user:
+            raise ValueError("User not found")
+
+        # Convert to serializable format
+        user.shopping_list = {
+            "recipes": [
+                {
+                    "recipe_uri": uri,
+                    "recipe_data": data["recipe"].model_dump(mode='json'),
+                    "count": data["count"],
+                    "date_added": data["date_added"]
+                }
+                for uri, data in shopping_list.recipes.items()
+            ],
+            "manual_items": [item.model_dump(mode='json') for item in shopping_list.manual_items],
+            "checked_items": list(shopping_list.checked_items),
+            "removed_items": list(getattr(shopping_list, 'removed_items', set())),
+        }
+
+        user_service.save_users()
 
     def _get_or_create_list(self, user_id: int) -> ShoppingList:
         """Get or create shopping list for user."""
-        if user_id not in self.shopping_lists:
-            self.shopping_lists[user_id] = ShoppingList(user_id)
-        return self.shopping_lists[user_id]
+        return self._load_from_user(user_id)
 
     def add_recipe(
         self, user_id: int, recipe_uri: str, session_id: str
@@ -68,6 +130,7 @@ class ShoppingService:
                 "date_added": datetime.now().isoformat(),
             }
 
+        self._save_to_user(user_id, shopping_list)
         return self.get_shopping_list(user_id)
 
     def remove_recipe(self, user_id: int, recipe_uri: str) -> ShoppingListResponse:
@@ -77,6 +140,7 @@ class ShoppingService:
         if recipe_uri in shopping_list.recipes:
             del shopping_list.recipes[recipe_uri]
 
+        self._save_to_user(user_id, shopping_list)
         return self.get_shopping_list(user_id)
 
     def toggle_item_checked(
@@ -90,6 +154,7 @@ class ShoppingService:
         else:
             shopping_list.checked_items.discard(item_name)
 
+        self._save_to_user(user_id, shopping_list)
         return self.get_shopping_list(user_id)
 
     def add_manual_item(
@@ -111,6 +176,7 @@ class ShoppingService:
 
         shopping_list.manual_items.append(manual_item)
 
+        self._save_to_user(user_id, shopping_list)
         return self.get_shopping_list(user_id)
 
     def delete_item(self, user_id: int, item_name: str) -> ShoppingListResponse:
@@ -125,9 +191,12 @@ class ShoppingService:
         # Remove from checked items
         shopping_list.checked_items.discard(item_name)
 
-        # Note: We cannot delete items that come from recipes
-        # Those will need the entire recipe to be removed
+        # Add to removed items set (allows removing individual recipe items)
+        if not hasattr(shopping_list, 'removed_items'):
+            shopping_list.removed_items = set()
+        shopping_list.removed_items.add(item_name.lower())
 
+        self._save_to_user(user_id, shopping_list)
         return self.get_shopping_list(user_id)
 
     def clear_shopping_list(self, user_id: int) -> ShoppingListResponse:
@@ -137,6 +206,7 @@ class ShoppingService:
         shopping_list.manual_items = []
         shopping_list.checked_items = set()
 
+        self._save_to_user(user_id, shopping_list)
         return self.get_shopping_list(user_id)
 
     def move_to_fridge(self, user_id: int) -> dict:
@@ -169,6 +239,9 @@ class ShoppingService:
         # Dictionary to accumulate ingredients: item_name -> CombinedShoppingItem
         combined: Dict[str, CombinedShoppingItem] = {}
 
+        # Get set of removed items
+        removed_items = getattr(shopping_list, 'removed_items', set())
+
         # Process recipes
         for recipe_uri, recipe_data in shopping_list.recipes.items():
             recipe: EdamamRecipe = recipe_data["recipe"]
@@ -181,6 +254,10 @@ class ShoppingService:
                     continue
 
                 name = parsed["name"].lower()
+
+                # Skip items that were manually removed
+                if name in removed_items:
+                    continue
 
                 # Check if we already have this ingredient
                 if name in combined:

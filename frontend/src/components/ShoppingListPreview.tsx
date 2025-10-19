@@ -2,7 +2,7 @@ import { useShoppingList } from '../hooks/useShoppingList';
 import { ShoppingCart, Loader2, X, Check } from 'lucide-react';
 
 export function ShoppingListPreview() {
-  const { shoppingList, isLoading, toggleItemChecked, deleteItem } = useShoppingList();
+  const { shoppingList, isLoading, toggleItemChecked, deleteItem, removeRecipe } = useShoppingList();
 
   if (isLoading) {
     return (
@@ -35,9 +35,11 @@ export function ShoppingListPreview() {
   };
 
   const handleDeleteItem = (itemName: string) => {
-    if (confirm(`Remove "${itemName}" from shopping list?`)) {
-      deleteItem.mutate(itemName);
-    }
+    deleteItem.mutate(itemName);
+  };
+
+  const handleRemoveRecipe = (recipeUri: string, recipeName: string) => {
+    removeRecipe.mutate(recipeUri);
   };
 
   return (
@@ -52,7 +54,7 @@ export function ShoppingListPreview() {
         {shoppingList.recipes.map((recipe) => (
           <div
             key={recipe.recipe_uri}
-            className="p-2 bg-gray-50 rounded border border-gray-200"
+            className="p-2 bg-gray-50 rounded border border-gray-200 group hover:bg-gray-100 transition-colors"
           >
             <div className="flex items-start gap-2">
               {recipe.recipe_image && (
@@ -70,6 +72,14 @@ export function ShoppingListPreview() {
                   <p className="text-xs text-gray-500">×{recipe.count}</p>
                 )}
               </div>
+              <button
+                onClick={() => handleRemoveRecipe(recipe.recipe_uri, recipe.recipe_name)}
+                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-100 rounded flex-shrink-0"
+                aria-label={`Remove ${recipe.recipe_name}`}
+                title="Remove recipe and all its items"
+              >
+                <X className="w-3 h-3 text-red-600" />
+              </button>
             </div>
           </div>
         ))}

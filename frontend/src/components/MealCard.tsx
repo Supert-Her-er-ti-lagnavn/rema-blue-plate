@@ -49,20 +49,28 @@ export const MealCard = ({
 
   // Wrap handler to always trigger animations
   const onAdd = async () => {
+    console.log('[MealCard] Adding recipe:', title);
+    console.log('[MealCard] recipeUri:', recipeUri);
+    console.log('[MealCard] sessionId:', sessionId);
+
     setIsAdding(true);
 
     try {
       // If we have recipeUri and sessionId, use backend
       if (recipeUri && sessionId) {
+        console.log('[MealCard] Using backend system');
         await addRecipe.mutateAsync({
           recipeUri,
           sessionId,
         });
+        console.log('[MealCard] Backend add successful');
       } else if (handleAddMeal) {
         // Use custom handler (for fridge logic with sample meals)
+        console.log('[MealCard] Using custom handler');
         handleAddMeal();
       } else {
         // Default handler for sample meals
+        console.log('[MealCard] Using localStorage system');
         addItemsToShoppingList(
           ingredients.map((ing, i) => ({
             id: Number(`${mealIndex || 0}${i + 1}${ing.name.length}${title.length}${Date.now()}`),
@@ -86,6 +94,7 @@ export const MealCard = ({
         setTimeout(() => setJustAdded(false), 1000);
       }, 300);
     } catch (error) {
+      console.error('[MealCard] Error adding recipe:', error);
       setIsAdding(false);
       // Error toast is already handled in useShoppingList
     }
