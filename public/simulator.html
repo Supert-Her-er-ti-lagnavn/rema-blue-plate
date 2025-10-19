@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Simulator</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin-top: 0;
+      color: #333;
+    }
+    .status {
+      padding: 8px 16px;
+      border-radius: 20px;
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    .status.connected {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .status.disconnected {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+    button:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    .log {
+      margin-top: 20px;
+      padding: 12px;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .log-entry {
+      margin-bottom: 4px;
+      color: #495057;
+    }
+    .controls {
+      margin-top: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #495057;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔧 WebSocket Simulator</h1>
+    <div id="status" class="status disconnected">Disconnected</div>
+    
+    <div class="controls">
+      <button id="connectBtn">Connect as Simulator</button>
+      <button id="randomBtn" disabled>Send Random Direction</button>
+      <button id="northBtn" disabled>Point North (90°)</button>
+      <button id="eastBtn" disabled>Point East (0°)</button>
+    </div>
+
+    <div class="log" id="log"></div>
+  </div>
+
+  <script>
+    let ws = null;
+    let isWaitingForFetch = false;
+    let currentProductId = "1010";
+
+    const statusEl = document.getElementById('status');
+    const logEl = document.getElementById('log');
+    const connectBtn = document.getElementById('connectBtn');
+    const randomBtn = document.getElementById('randomBtn');
+    const northBtn = document.getElementById('northBtn');
+    const eastBtn = document.getElementById('eastBtn');
+
+    function log(message) {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      const timestamp = new Date().toLocaleTimeString();
+      entry.textContent = `[${timestamp}] ${message}`;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function updateStatus(connected) {
+      if (connected) {
+        statusEl.textContent = 'Connected';
+        statusEl.className = 'status connected';
+        connectBtn.textContent = 'Disconnect';
+        randomBtn.disabled = false;
+        northBtn.disabled = false;
+        eastBtn.disabled = false;
+      } else {
+        statusEl.textContent = 'Disconnected';
+        statusEl.className = 'status disconnected';
+        connectBtn.textContent = 'Connect as Simulator';
+        randomBtn.disabled = true;
+        northBtn.disabled = true;
+        eastBtn.disabled = true;
+      }
+    }
+
+    function sendDirection(dx, dy) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log('❌ Cannot send - not connected');
+        return;
+      }
+
+      const message = {
+        role: "simulator",
+        msg_type: "direction",
+        dx: dx,
+        dy: dy,
+        closestProductId: currentProductId
+      };
+
+      ws.send(JSON.stringify(message));
+      log(`📤 Sent direction: dx=${dx.toFixed(2)}, dy=${dy.toFixed(2)}, product=${currentProductId}`);
+      
+      // Increment product ID for next direction
+      currentProductId = String(parseInt(currentProductId) + 1);
+      if (parseInt(currentProductId) >= 1020) {
+        currentProductId = "1010"; // Loop back
+      }
+    }
+
+    connectBtn.addEventListener('click', () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+        return;
+      }
+
+      ws = new WebSocket('ws://localhost:8765');
+
+      ws.onopen = () => {
+        log('✅ Connected to server');
+        
+        // Send init message
+        const initMsg = { role: "simulator", msg_type: "init" };
+        ws.send(JSON.stringify(initMsg));
+        log('📤 Sent init message');
+        
+        updateStatus(true);
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          log(`📥 Received: ${JSON.stringify(data)}`);
+
+          if (data.type === "fetch_closest_product") {
+            log('🎯 Received fetch_closest_product request');
+            isWaitingForFetch = true;
+            
+            // Auto-respond with a random direction after 100ms
+            setTimeout(() => {
+              const angle = Math.random() * Math.PI * 2;
+              const dx = Math.cos(angle);
+              const dy = Math.sin(angle);
+              sendDirection(dx, dy);
+            }, 100);
+          }
+        } catch (err) {
+          log(`❌ Error parsing message: ${err.message}`);
+        }
+      };
+
+      ws.onerror = (error) => {
+        log(`❌ WebSocket error: ${error.message || 'Unknown error'}`);
+      };
+
+      ws.onclose = () => {
+        log('🔌 Connection closed');
+        updateStatus(false);
+        ws = null;
+      };
+    });
+
+    randomBtn.addEventListener('click', () => {
+      const angle = Math.random() * Math.PI * 2;
+      const dx = Math.cos(angle);
+      const dy = Math.sin(angle);
+      sendDirection(dx, dy);
+    });
+
+    northBtn.addEventListener('click', () => {
+      // North is 90° = dy=1, dx=0
+      sendDirection(0, 1);
+    });
+
+    eastBtn.addEventListener('click', () => {
+      // East is 0° = dy=0, dx=1
+      sendDirection(1, 0);
+    });
+
+    log('🚀 Simulator ready. Click "Connect as Simulator" to start.');
+  </script>
+</body>
+</html>
