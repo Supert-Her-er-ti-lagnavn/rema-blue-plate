@@ -4,7 +4,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { ChatWidget } from "@/components/ChatWidget";
 import SegmentedToggle from "@/components/ToggleShopping";
 import { Header } from "@/components/Header";
 import Index from "./pages/Index";
@@ -78,8 +77,6 @@ const AppContent: React.FC<{
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {/* Global Chat Widget - appears on protected pages only */}
-      {!hideToggle && <ChatWidget />}
       {/* Sticky Toggle at Bottom - appears on protected pages only */}
       {!hideToggle && <SegmentedToggle onToggle={onToggle} />}
     </>

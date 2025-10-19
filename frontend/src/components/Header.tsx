@@ -133,10 +133,6 @@ export const Header: React.FC = () => {
             )}
           </div>
 
-          <Badge variant={badgeVariant as any} className="hidden sm:flex items-center gap-1 bg-white/10 text-white border-white/30">
-            <Leaf size={12} /> {labelMap[dietaryPreference]}
-          </Badge>
-
           <button
             onClick={() => navigate('/notifications')}
             className="relative w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105"
@@ -148,11 +144,6 @@ export const Header: React.FC = () => {
               3
             </div>
           </button>
-        </div>
-
-        {/* Center - Optional breadcrumb or status */}
-        <div className="hidden md:flex items-center text-white/90 text-sm font-medium">
-          <span>Rema 1000</span>
         </div>
 
         {/* Right side - Rema 1000 Logo and Brand */}

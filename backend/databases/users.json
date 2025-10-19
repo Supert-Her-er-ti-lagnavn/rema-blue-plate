@@ -325,6 +325,63 @@
             },
             "count": 1,
             "date_added": "2025-10-19T13:24:09.144013"
+          },
+          {
+            "recipe_uri": "http://www.edamam.com/ontologies/edamam.owl#recipe_bc42b457b71e477db4b9d325f7754c62",
+            "recipe_data": {
+              "uri": "http://www.edamam.com/ontologies/edamam.owl#recipe_bc42b457b71e477db4b9d325f7754c62",
+              "label": "Battered Amritsari fish",
+              "image": "https://edamam-product-images.s3.amazonaws.com/web-img/c34/c34022c623c133657b4df6d17d35b67d.jpg?X-Amz-Security-Token=IQoJb3JpZ2luX2VjECsaCXVzLWVhc3QtMSJHMEUCIQCk1qpkDfhxWFhZnDgrsUST3iM04atidFuUlUAvXgP10QIgbiXkdIbl6TWsCIZGs%2BVLu2TxDX1c77J5hCk3jMZB73sqwgUI1P%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgwxODcwMTcxNTA5ODYiDJRVKH2oPwM9lfVBsiqWBb8dmuXI9KGYZ%2BWR6oZVy6WKNoFOLSt7UObfZu4e%2FhUPWzlAnVmmQTtBP3IMvS3nrmSb6urvcK%2BLUeiFGFHaMrK7fXTgEMlwx4TabzL6aE3Sq409RC0Hu38MukES8q63eE7iF%2BHlcAqM5mCo8dguSMFWm%2F9bwNeEn4%2BkgyziCr6BAwrwlSMrQN2FPQf9tM4GDNRjm3Hkti1YP6zFHXKXnr9HrTLAmQqxOa0%2BcpUi2KwQqPvTLhmlDGjsoVPTPokFm4oW6h5ER7vQwkgRcGdVLf%2Fqm7Ds3IOi8Fuj%2BDJV3lLUg%2Beqf2yFVTeQ%2FqNxTceA07jwZ4gx0h2ktc%2FSKnFDf2j0kDKhNEapkisysqhz%2FTQJKYU%2BjlZihXP94qGogxjRnWkVKDlo7a%2FCGUL2NCJ4DxoQoaysnaLrice9z4%2Bg%2Box01cxQ6vxj1aGj%2Byy8Ql4AEsciJbJBtgE5bdL5smc0bROegAUPDEbQdvpJeEVwn5oDQ1JcHXFBr17llQKVmNJfN99H5mwtQEKr22AKER89w7tPhQCvUUViBAg7JcFjUQUfFpzaY1bN%2Fcq%2BVI942z2nOaJAoO93kbY%2FoAOBcpRTcOluT6DMjCS6Wh%2FprMMKwNHgYTMBn9a507DcEZwPcP9SJYrZHx6f6tvSEguFN7wKfKCFjhHBh%2F2z2bUSxx3TTIsOQJ7aOIqAehfEO4%2BcUne49u7DAnAwhAgEf2DHloeXOq8eG1de4yLpO7lDtnybBg9eZd1QYVDfzzUqWa7DrUyBxPWhQfrqZRUYNklArgUEtVaTA22CBUNMfypRQqe4bdRST9%2Bd6OjEP%2FzIgtvtLTHVhGgKB79m64xHtgUcrj5dPznjdtU3T8MANJejHsWer7b561h02hjVMPb30scGOrEBDGOD7oZihBmiLHAaJG2%2F6O33UA8WoqWUbIqr3gE0%2B1Oc3rys3c5Gcy3wxMGJaT5VUSpAFcvR3vnu3Q9D9%2BrMEf6VtK90Vwykg%2BXUROJgnCtLi39Hs7yJHgaBE3ACG0E0kwWJYMC5HAldyN8wDcdGAexAtuvk%2B%2F0ocRK210uq494Mx2fiT1ZUEeb0t%2FSMmcB12anrvfpmv6SO8YFEwg%2Bp60gH%2FVHOZ9gjfEo0lrdPQLDU&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20251019T114036Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=ASIASXCYXIIFCJ2NB3YL%2F20251019%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4a58fcd590a5211d5dddd4c90154c6f891d03a976f390787d85ac48e2a4dce76",
+              "source": "BBC Good Food",
+              "url": "https://www.bbcgoodfood.com/recipes/battered-amritsari-fish",
+              "yield_servings": 8,
+              "ingredientLines": [
+                "600g white fish fillets or loins, cut into 4cm/1 1/2 in chunks (see tip)",
+                "vegetable oil, for frying",
+                "1 ½ tsp chaat masala (see tip)"
+              ],
+              "calories": 1382.8746,
+              "totalTime": 15.0,
+              "cuisineType": [
+                "mediterranean"
+              ],
+              "mealType": [
+                "lunch/dinner"
+              ],
+              "dishType": [
+                "main course"
+              ],
+              "healthLabels": [
+                "Sugar-Conscious",
+                "Low Sugar",
+                "Kidney-Friendly",
+                "Keto-Friendly",
+                "Pescatarian",
+                "Mediterranean",
+                "Dairy-Free",
+                "Gluten-Free",
+                "Wheat-Free",
+                "Egg-Free",
+                "Peanut-Free",
+                "Tree-Nut-Free",
+                "Soy-Free",
+                "Shellfish-Free",
+                "Pork-Free",
+                "Red-Meat-Free",
+                "Crustacean-Free",
+                "Celery-Free",
+                "Mustard-Free",
+                "Sesame-Free",
+                "Lupine-Free",
+                "Mollusk-Free",
+                "Alcohol-Free",
+                "Sulfite-Free",
+                "FODMAP-Free",
+                "Kosher"
+              ]
+            },
+            "count": 1,
+            "date_added": "2025-10-19T13:40:44.969988"
           }
         ],
         "manual_items": [],
@@ -333,6 +390,18 @@
           "tomato"
         ]
       }
+    },
+    {
+      "id": 12,
+      "name": "kadde",
+      "email": "test@gmail.com",
+      "family": [],
+      "dietLabels": [
+        "gluten-free"
+      ],
+      "customPreferences": [],
+      "fridge": [],
+      "shopping_list": {}
     }
   ]
 }
