@@ -14,7 +14,7 @@ import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 import { ShoppingProvider } from "@/contexts/ShoppingContext";
 import { PreferencesProvider } from "@/contexts/PreferencesContext";
-import { FridgeMode } from '@/components/FridgeMode';
+import FridgeMode from '@/components/FridgeMode';
 import { NotificationProvider } from '@/contexts/NotificationContext';
 
 const queryClient = new QueryClient();

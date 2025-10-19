@@ -133,7 +133,7 @@ const Notifications: React.FC = () => {
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <Badge variant={getBadgeVariant(notification.type) as any} className="text-xs">
+                    <Badge variant={getBadgeVariant(notification.type)} className="text-xs">
                       {getTypeLabel(notification.type)}
                     </Badge>
                     {!notification.read && (
