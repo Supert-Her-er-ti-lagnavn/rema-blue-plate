@@ -91,7 +91,7 @@ npm run dev
 Then open:
 
 ```
-http://localhost:5173
+http://localhost:8080
 ```
 
 ---
@@ -102,6 +102,12 @@ http://localhost:5173
 cd backend
 uv sync         # or pip install -r requirements.txt
 uv run python main.py
+```
+
+With problem WARNING:  You must pass the application as an import string to enable 'reload' or 'workers'.
+
+```bash
+uv run uvicorn main:app --reload --port 8000
 ```
 
 The backend will be available at:
