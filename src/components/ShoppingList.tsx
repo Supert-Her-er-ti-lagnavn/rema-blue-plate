@@ -103,55 +103,58 @@ export const ShoppingList = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Group items by mealTitle */}
+          {/* Group items by mealId (each meal instance gets its own group) */}
           {Object.entries(
             shoppingList.reduce((acc, item) => {
-              const key = item.mealTitle || 'Other';
+              const key = item.mealId ? `${item.mealId}` : 'Other';
               if (!acc[key]) acc[key] = [];
               acc[key].push(item);
               return acc;
             }, {} as Record<string, typeof shoppingList>)
-          ).map(([group, items]) => (
-            <div key={group} className="space-y-2">
-              <h4 className="font-black text-foreground uppercase text-sm flex items-center gap-2">
-                {group}
-              </h4>
-              {items.map(item => (
-                <div key={item.id} className={`flex justify-between items-center p-3 rounded-lg border group ${item.checked ? 'bg-green-100 border-green-400' : 'bg-secondary border-border'}`}>
-                  <div className="flex-1">
-                    <span className={`font-bold text-foreground ${item.checked ? 'line-through text-muted-foreground' : ''}`}>{item.name}</span>
-                    <span className="text-sm text-muted-foreground ml-2 font-semibold">x{item.quantity}</span>
-                    <span className="text-xs ml-2 text-muted-foreground">Aisle {item.aisle}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-black text-primary text-lg">{item.price} kr</span>
-                    {!item.checked && (
+          ).map(([groupKey, items]) => {
+            const displayName = items[0]?.mealTitle || (groupKey === 'Other' ? 'Other' : `Meal ${groupKey}`);
+            return (
+              <div key={groupKey} className="space-y-2">
+                <h4 className="font-black text-foreground uppercase text-sm flex items-center gap-2">
+                  {displayName}
+                </h4>
+                {items.map(item => (
+                  <div key={item.id} className={`flex justify-between items-center p-3 rounded-lg border group ${item.checked ? 'bg-green-100 border-green-400' : 'bg-secondary border-border'}`}>
+                    <div className="flex-1">
+                      <span className={`font-bold text-foreground ${item.checked ? 'line-through text-muted-foreground' : ''}`}>{item.name}</span>
+                      <span className="text-sm text-muted-foreground ml-2 font-semibold">x{item.quantity}</span>
+                      <span className="text-xs ml-2 text-muted-foreground">Aisle {item.aisle}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-primary text-lg">{item.price} kr</span>
+                      {!item.checked && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={async () => {
+                            markItemFound(item.id);
+                            await recordPurchaseAndRemove(item.id);
+                            toast.success(`✓ ${item.name} lagt til budsjettet (${item.price} kr)`);
+                          }}
+                          title="Mark as found"
+                        >
+                          <Check className="h-4 w-4 text-green-600" />
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={async () => {
-                          markItemFound(item.id);
-                          await recordPurchaseAndRemove(item.id);
-                          toast.success(`✓ ${item.name} lagt til budsjettet (${item.price} kr)`);
-                        }}
-                        title="Mark as found"
+                        onClick={() => removeItemFromList(item.id)}
+                        title="Remove"
                       >
-                        <Check className="h-4 w-4 text-green-600" />
+                        <X className="h-4 w-4" />
                       </Button>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeItemFromList(item.id)}
-                      title="Remove"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ))}
+                ))}
+              </div>
+            );
+          })}
         </div>
       )}
 
