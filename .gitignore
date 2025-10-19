@@ -1,11 +1,16 @@
-# Node modules
+# Node modules (all locations)
 node_modules/
 .vite/
 
-# IDE
+# Build output
+dist/
+build/
+frontend/dist/
+
+# IDE and OS files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 
 # Logs
@@ -14,15 +19,31 @@ npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
 
-# Python
+# Python artifacts
 __pycache__/
 *.py[cod]
 *$py.class
 .venv/
 venv/
 env/
+.pytest_cache/
+.mypy_cache/
+pip-wheel-metadata/
 
-# Environment files
+# Python bytecode & caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Test / type-check caches
+.pytest_cache/
+.mypy_cache/
+pip-wheel-metadata/
+
+# Environment files and secrets
+# Keep example files (like .env.example) tracked, but ignore real env files
+.env
 .env.local
+!.env.example
 *.local
 .env

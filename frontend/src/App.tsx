@@ -78,8 +78,6 @@ const AppContent: React.FC<{
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {/* Global Chat Widget - appears on protected pages only */}
-      {!hideToggle && <ChatWidget />}
       {/* Sticky Toggle at Bottom - appears on protected pages only */}
       {!hideToggle && <SegmentedToggle onToggle={onToggle} />}
     </>
