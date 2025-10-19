@@ -1,0 +1,25 @@
+{
+    "Recepie": [
+    {
+      "idRecepie": 100,
+      "Name": "Kyllingsalat",
+      "Picture": "iVBORw0KGgoAAAANSUhEUgAA...", 
+      "Ingredients": "Kylling, Salat, Tomat, Agurk, Olivenolje",
+      "Allergens": "Ingen"
+    },
+    {
+      "idRecepie": 101,
+      "Name": "Pasta Alfredo",
+      "Picture": "iVBORw0KGgoAAAANSUhEUgAA...",
+      "Ingredients": "Pasta, Fløte, Smør, Parmesan, Hvitløk",
+      "Allergens": "Gluten, Laktose"
+    },
+    {
+      "idRecepie": 102,
+      "Name": "Pad Thai med tofu",
+      "Picture": "iVBORw0KGgoAAAANSUhEUgAA...",
+      "Ingredients": "Risnudler, Tofu, Egg, Peanøtter, Bønnespirer",
+      "Allergens": "Peanøtter, Egg"
+    }
+  ]
+}

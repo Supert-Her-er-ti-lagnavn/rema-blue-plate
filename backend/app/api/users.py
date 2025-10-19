@@ -1,35 +1,53 @@
-from fastapi import APIRouter
+"""API endpoints for user-related operations."""
+
+from typing import List
+from fastapi import APIRouter, HTTPException
+from app.models.user import FamilyMember, FridgeUpdate
+from app.services.user_service import user_service
 
 router = APIRouter()
 
-# Hardcoded user data for development
-HARDCODED_USERS = [
-    {
-        "id": 1,
-        "email": "user@rema1000.no",
-        "full_name": "Test User",
-        "is_active": True,
-        "created_at": "2025-10-18T10:00:00Z"
-    }
-]
 
-@router.get("/me")
-async def get_current_user():
-    """Get current user profile"""
-    return HARDCODED_USERS[0]
+@router.get("/{user_id}/family", response_model=List[FamilyMember])
+async def get_family_members(user_id: int):
+    """
+    Get family members for a user.
 
-@router.post("/register")
-async def register_user(user_data: dict):
-    """Register a new user"""
-    # For development, just return success
-    return {"message": "User registered successfully", "user_id": 1}
+    Returns a list of family member names and IDs that the user can choose
+    to cook with.
+    """
+    user = user_service.get_user(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail=f"User {user_id} not found")
 
-@router.post("/login")
-async def login_user(credentials: dict):
-    """Login user"""
-    # For development, just return a mock token
-    return {
-        "access_token": "mock_token_12345",
-        "token_type": "bearer",
-        "user": HARDCODED_USERS[0]
-    }
+    family_members = user_service.get_family_members(user_id)
+    return family_members
+
+
+@router.get("/{user_id}/fridge", response_model=List[str])
+async def get_fridge(user_id: int):
+    """
+    Get fridge items for a user.
+
+    Returns the list of ingredients the user currently has in their fridge.
+    """
+    user = user_service.get_user(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+
+    fridge_items = user_service.get_fridge(user_id)
+    return fridge_items
+
+
+@router.put("/{user_id}/fridge", response_model=List[str])
+async def update_fridge(user_id: int, update: FridgeUpdate):
+    """
+    Update fridge items for a user.
+
+    Replace the user's fridge contents with the provided list of items.
+    """
+    try:
+        updated_items = user_service.update_fridge(user_id, update.items)
+        return updated_items
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))

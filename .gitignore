@@ -1,5 +1,8 @@
+########################################
+# General
+########################################
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,16 +10,33 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependency folders
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+frontend/dist/
+backend/__pycache__/
+
+# Environment and local config
 *.local
+.env*
+frontend/.env*
+backend/.env*
 
-# IDE specific files
-*.code-workspace
+# IDE and editor files
+.vscode/
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-
-# Python virtual environments
+# Python
 rema_venv/
 .venv/
 venv/
@@ -25,16 +45,40 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Frontend specific
+frontend/node_modules/
+frontend/.next/
+frontend/.cache/
+frontend/.turbo/
+frontend/.parcel-cache/
+frontend/.eslintcache
+frontend/bun.lockb
 
+# Backend specific
+backend/.mypy_cache/
+backend/.pytest_cache/
+backend/.coverage
+backend/.envrc
+backend/.sqlite3
 
-.venv/
+# Keep important config and source files
+!frontend/package.json
+!frontend/package-lock.json
+!frontend/yarn.lock
+!frontend/pnpm-lock.yaml
+!frontend/tsconfig.json
+!frontend/vite.config.ts
+!frontend/tailwind.config.ts
+!frontend/postcss.config.js
+!frontend/eslint.config.js
+!frontend/components.json
+!frontend/index.html
+!frontend/public/
+!frontend/src/
+!backend/pyproject.toml
+!backend/requirements.txt
+!backend/main.py
+!backend/README.md
+!backend/app/
+!backend/agent/
+!backend/databases/
