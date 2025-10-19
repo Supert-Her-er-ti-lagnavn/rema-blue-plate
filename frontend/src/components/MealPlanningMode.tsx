@@ -44,7 +44,7 @@ export const MealPlanningMode: React.FC = () => {
     if (user && !selectedUserIds.includes(user.id)) {
       setSelectedUserIds([user.id]);
     }
-  }, [user]);
+  }, [user, selectedUserIds]);
 
   const handleSearch = async (selectedUserIds: number[]) => {
     await searchRecipes(selectedUserIds);
