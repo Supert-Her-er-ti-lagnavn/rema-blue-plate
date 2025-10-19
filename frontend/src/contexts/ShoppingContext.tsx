@@ -56,8 +56,17 @@ const DEFAULT_SHOPPING_LIST: ShoppingItem[] = [
 
 export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [shoppingList, setShoppingList] = useState<ShoppingItem[]>(() => {
-    const saved = localStorage.getItem('rema-shopping-list');
-    return saved ? JSON.parse(saved) : DEFAULT_SHOPPING_LIST;
+    try {
+      const saved = localStorage.getItem('rema-shopping-list');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // If parsed is a non-empty array, use it; otherwise fall back to default
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      // ignore JSON parse errors and fall back to default
+    }
+    return DEFAULT_SHOPPING_LIST;
   });
 
   useEffect(() => {
