@@ -382,6 +382,64 @@
             },
             "count": 1,
             "date_added": "2025-10-19T13:40:44.969988"
+          },
+          {
+            "recipe_uri": "http://www.edamam.com/ontologies/edamam.owl#recipe_f1298c5a64bb4cc6a9cfe3da6eaba5ec",
+            "recipe_data": {
+              "uri": "http://www.edamam.com/ontologies/edamam.owl#recipe_f1298c5a64bb4cc6a9cfe3da6eaba5ec",
+              "label": "Recipe: Golden Beet and Barley Salad with Rainbow Chard",
+              "image": "https://edamam-product-images.s3.amazonaws.com/web-img/308/308da2d722b4dcb3687394b7090d7101?X-Amz-Security-Token=IQoJb3JpZ2luX2VjECsaCXVzLWVhc3QtMSJGMEQCIHRHTtfvGBCkOmKXbzbMY3ITYVXOSzCcEQSpLPIbm2T3AiAOZuD4c8nts4apqV41ImWBXqv5wr%2BnWOUlHxSJ13%2FDDCrCBQjU%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDE4NzAxNzE1MDk4NiIMflli8vYkRQciOhbBKpYFpsijxDFLg7L3vYqrqfYH72pCaZubVs%2BKgbwyqzQh%2F8fqjRuZFyeN4OSoNwqXuL77OG9iuUBtPKARbpPXS6Oq7ZjxbEAHg6oM9VqL0Cb9pZmwNd1BQc5Rolz%2BUMiVpbl%2B%2B%2B%2FN2AnIV4tr3UiZgkoLJmoFiWT1Qr%2BivZe4fcaG02emw7XeSdXZ%2F%2Fiz71EwKCnSQ1qHrj34L4t%2BygphmSpLj9%2FqsB3N8K%2BtF4dM%2FfCaeTEMjUGk6MTyetfn%2FvX38p3wFUG35ZLkEH4zjFcTvNtQpK5lPZaCvSqWeMnOmBxJQvMaFnrdCbnKI4zFEVKsqDHbLR9o2eAw2foH7wqAM5QNq%2FWadpdTXTxnLvv%2FbssDdfIqw80CfcXGTIp%2FDHAKgSXUG%2FtnlMObnuigDZ8nbmsVSyz1SSJJs4DHymSAuY8sguO3bvG%2BEZR6J9goUGyDb4euygIi3XPhxSOLxumwMwiEOQN%2F6xgcft80rxGta%2BftV%2FevlQWMHfSOk9K0V1Fq4q3ot%2BPKclQOdRQKzlUwJvUCkagOXi7PrAlfFH6fAztl1ogPTkmufGDSGZSAMpbhT5UPlkUA3mq%2FzLMB37hkvoqv3aN%2BnAbGdhYP0IdIo6cD0VN1QdlYqI63Prt8EMq95734Z4fK6K2ETYx8K4hNkrTzszbVEbryofi4ijMNAifRdCJqxLqvSgnBmV4xyNBMCF0nd6PIP4xR9ghyNKJsUrJ44sSqq82SvmjHvt%2BHNY6sLr96wtBVWW5Ask8cvJGIe2QYF7QJ47vumB3gLWTGOWST%2F%2FolKtsnu4v3pIWBzfBYDkV9Tdnml5P88LlvVIIHOR0JCsl%2Fav5crOQhq4stHA%2FTM0Kh6fOdCrxbZMEMX0Cmzm0aihdi2Q8w3ffSxwY6sgHRrCvFgpbMi5%2FxBQQdj73RModnruc8Zw5cHAQ2cNBPA5X1bdx4Hwg972xcGCsn66v16a4jgoC9SF70uhDP5e72WzA7%2B3CJ1OOakH2dG1y%2FPwN3l%2FZ2lZwht4p%2BElFRbPgE0WDYGuE1WPm1J1jF2Nm%2FWGYvcfwV4B3Ov81jDGYBuPJfIhObZbQZPiyL91hwlUV7RGWYU64jiPAJGrJFN7KZvbVBHEdTlM46M3gqHw2wgSxX&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20251019T114531Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=ASIASXCYXIIFCQYFBBTS%2F20251019%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=fa6cb8dc9898b01dba6dfc89bbe9267991cf1efeb9fc5ac43ee79c3a7050b2b3",
+              "source": "The Kitchn",
+              "url": "https://www.thekitchn.com/recipe-riff-golden-beet-and-ba-88567",
+              "yield_servings": 8,
+              "ingredientLines": [
+                "4 medium golden beets, tops removed (see Recipe Note)",
+                "1 cup dried pearl barley",
+                "3/4 teaspoon kosher salt, divided, plus more for seasoning",
+                "1/2 large red onion, minced (about 1 cup)",
+                "1 bunch rainbow Swiss chard (about 1 pound)",
+                "2 1/2 tablespoons extra-virgin olive oil, divided",
+                "3 tablespoons freshly squeezed lemon juice, divided",
+                "4 ounces feta cheese, crumbled, plus more for serving",
+                "Freshly ground black pepper"
+              ],
+              "calories": 1569.7593425138766,
+              "totalTime": 0.0,
+              "cuisineType": [
+                "eastern europe"
+              ],
+              "mealType": [
+                "lunch/dinner"
+              ],
+              "dishType": [
+                "salad"
+              ],
+              "healthLabels": [
+                "Vegetarian",
+                "Pescatarian",
+                "Mediterranean",
+                "Wheat-Free",
+                "Egg-Free",
+                "Peanut-Free",
+                "Tree-Nut-Free",
+                "Soy-Free",
+                "Fish-Free",
+                "Shellfish-Free",
+                "Pork-Free",
+                "Red-Meat-Free",
+                "Crustacean-Free",
+                "Celery-Free",
+                "Mustard-Free",
+                "Sesame-Free",
+                "Lupine-Free",
+                "Mollusk-Free",
+                "Alcohol-Free",
+                "Sulfite-Free",
+                "Kosher"
+              ]
+            },
+            "count": 1,
+            "date_added": "2025-10-19T13:45:43.691230"
           }
         ],
         "manual_items": [],

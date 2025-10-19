@@ -120,6 +120,7 @@ export const MealPlanningMode: React.FC = () => {
                       handleAddMeal={() => {}}
                       recipeUri={recipe.uri}
                       sessionId={sessionId}
+                      recipeUrl={recipe.url}
                     />
                   ))
                 : sampleMeals.map((meal, index) => (

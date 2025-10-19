@@ -26,6 +26,7 @@ interface MealCardProps {
   handleAddMeal?: () => void;
   recipeUri?: string;
   sessionId?: string | null;
+  recipeUrl?: string;
 }
 
 
@@ -39,7 +40,8 @@ export const MealCard = ({
   mealIndex,
   handleAddMeal,
   recipeUri,
-  sessionId
+  sessionId,
+  recipeUrl
 }: MealCardProps) => {
   const { addItemsToShoppingList } = useShoppingContext();
   const { addRecipe } = useShoppingList();
@@ -133,17 +135,27 @@ export const MealCard = ({
           <h4 className="font-bold text-foreground uppercase text-sm">Ingredients:</h4>
           <ul className="space-y-1.5">
             {ingredients.map((ingredient, index) => (
-              <li key={index} className="flex justify-between text-sm border-b border-border pb-1.5">
+              <li key={index} className="text-sm border-b border-border pb-1.5">
                 <span className="text-foreground font-medium">
                   {ingredient.amount} {ingredient.name}
                 </span>
-                <span className="font-bold text-foreground">{ingredient.price} kr</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <Button 
+        {recipeUrl && (
+          <a
+            href={recipeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block text-center text-sm text-blue-600 hover:text-blue-800 underline font-medium py-2"
+          >
+            View Original Recipe →
+          </a>
+        )}
+
+        <Button
           className={`w-full gap-2 font-bold uppercase text-sm transition-all duration-300 ${
             isAdding ? 'animate-pulse scale-95' : ''
           } ${

@@ -111,6 +111,9 @@ export function ShoppingListPreview() {
             >
               {item.total_quantity} {item.unit} {item.name}
             </span>
+            <span className="text-xs font-semibold text-gray-700 mr-2">
+              20 kr
+            </span>
             <button
               onClick={() => handleDeleteItem(item.name)}
               className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-100 rounded"
