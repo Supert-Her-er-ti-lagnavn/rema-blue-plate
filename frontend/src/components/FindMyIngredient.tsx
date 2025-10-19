@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useShoppingContext } from '@/contexts/useShoppingContext';
 import { Wallet } from 'lucide-react';
-import { apiService } from '@/services/api';
+import { toast } from 'sonner';
 
 const FindMyIngredient: React.FC = () => {
   const { getCurrentItem, markItemFound, getCompletedCount, getTotalCount, shoppingList, recordPurchaseAndRemove } = useShoppingContext();
@@ -22,20 +22,21 @@ const FindMyIngredient: React.FC = () => {
   const totalCount = getTotalCount();
   const progressPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
-  // Spent amount from backend monthly purchases
-  const [spentAmount, setSpentAmount] = useState(0);
+  // Spent amount stored in localStorage
+  const [spentAmount, setSpentAmount] = useState(() => {
+    const saved = localStorage.getItem('monthlySpent');
+    return saved ? parseFloat(saved) : 0;
+  });
 
-  const refreshMonthlySpent = async () => {
-    try {
-      const res = await apiService.getCurrentMonthPurchases();
-      setSpentAmount(res.total_spent || 0);
-    } catch (e) {
-      // ignore backend errors for UI
-    }
+  const refreshMonthlySpent = () => {
+    const saved = localStorage.getItem('monthlySpent');
+    setSpentAmount(saved ? parseFloat(saved) : 0);
   };
 
   useEffect(() => {
-    refreshMonthlySpent();
+    const handleStorageChange = () => refreshMonthlySpent();
+    window.addEventListener('monthlySpentUpdated', handleStorageChange);
+    return () => window.removeEventListener('monthlySpentUpdated', handleStorageChange);
   }, []);
 
   const budgetPercentage = (spentAmount / monthlyBudget) * 100;
@@ -146,10 +147,9 @@ const FindMyIngredient: React.FC = () => {
             onClick={async () => {
               setPulseAnimation(true);
               setTimeout(() => setPulseAnimation(false), 1000);
-              // Update fridge, then record and remove from list
               markItemFound(currentItem.id);
               await recordPurchaseAndRemove(currentItem.id);
-              refreshMonthlySpent();
+              toast.success(`✓ ${currentItem.name} lagt til budsjettet (${currentItem.price} kr)`);
             }}
             className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors"
           >

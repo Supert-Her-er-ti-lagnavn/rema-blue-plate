@@ -5,7 +5,6 @@ import { useShoppingContext } from "@/contexts/useShoppingContext";
 import { sampleMeals } from "@/components/sampleMeals";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { apiService } from "@/services/api";
 
 export const ShoppingList = () => {
   const {
@@ -46,20 +45,21 @@ export const ShoppingList = () => {
     }
   }, 0);
 
-  // Spent amount fetched from backend monthly purchases
-  const [spentAmount, setSpentAmount] = useState(0);
+  // Spent amount stored in localStorage
+  const [spentAmount, setSpentAmount] = useState(() => {
+    const saved = localStorage.getItem('monthlySpent');
+    return saved ? parseFloat(saved) : 0;
+  });
 
-  const refreshMonthlySpent = async () => {
-    try {
-      const res = await apiService.getCurrentMonthPurchases();
-      setSpentAmount(res.total_spent || 0);
-    } catch (e) {
-      // keep UI functional even if backend not available
-    }
+  const refreshMonthlySpent = () => {
+    const saved = localStorage.getItem('monthlySpent');
+    setSpentAmount(saved ? parseFloat(saved) : 0);
   };
 
   useEffect(() => {
-    refreshMonthlySpent();
+    const handleStorageChange = () => refreshMonthlySpent();
+    window.addEventListener('monthlySpentUpdated', handleStorageChange);
+    return () => window.removeEventListener('monthlySpentUpdated', handleStorageChange);
   }, []);
 
   const budgetPercentage = (spentAmount / monthlyBudget) * 100;
@@ -127,10 +127,9 @@ export const ShoppingList = () => {
                         variant="ghost"
                         size="icon"
                         onClick={async () => {
-                          // Mark found (to update fridge) then record purchase and remove
                           markItemFound(item.id);
                           await recordPurchaseAndRemove(item.id);
-                          refreshMonthlySpent();
+                          toast.success(`✓ ${item.name} lagt til budsjettet (${item.price} kr)`);
                         }}
                         title="Mark as found"
                       >

@@ -66,10 +66,8 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const addItemsToShoppingList = (items: ShoppingItem[]) => {
     setShoppingList(currentList => {
-      const newItems = items.filter(item => 
-        !currentList.some(existing => existing.id === item.id)
-      );
-      return [...currentList, ...newItems].sort((a, b) => a.aisle - b.aisle);
+      // Always add items (allow duplicates) since they have unique IDs
+      return [...currentList, ...items].sort((a, b) => a.aisle - b.aisle);
     });
   };
 
@@ -103,6 +101,12 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return currentList.filter(item => item.id !== itemId);
     });
     if (purchased) {
+      // Update monthly spent in localStorage
+      const currentSpent = parseFloat(localStorage.getItem('monthlySpent') || '0');
+      const newSpent = currentSpent + purchased.price;
+      localStorage.setItem('monthlySpent', newSpent.toString());
+      window.dispatchEvent(new Event('monthlySpentUpdated'));
+
       const payload: PurchasedItem = {
         id: purchased.id,
         name: purchased.name,
@@ -115,9 +119,7 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       try {
         await apiService.recordPurchase(payload);
       } catch (e) {
-        // If backend fails, re-add item to list to avoid data loss
-        setShoppingList(current => [purchased as ShoppingItem, ...current]);
-        throw e;
+        // Backend not available, but localStorage is updated
       }
     }
   };
