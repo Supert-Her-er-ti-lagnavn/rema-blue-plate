@@ -70,7 +70,7 @@ class UserService:
             dietLabels=request.dietLabels,
             customPreferences=request.customPreferences,
             fridge=[],
-            shopping_list=[],
+            shopping_list={},
         )
 
         # Add to database

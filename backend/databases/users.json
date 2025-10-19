@@ -212,7 +212,121 @@
       ],
       "fridge": [],
       "shopping_list": {
-        "recipes": [],
+        "recipes": [
+          {
+            "recipe_uri": "http://www.edamam.com/ontologies/edamam.owl#recipe_59abcacf89d1c89a7a1422c9e3129d5e",
+            "recipe_data": {
+              "uri": "http://www.edamam.com/ontologies/edamam.owl#recipe_59abcacf89d1c89a7a1422c9e3129d5e",
+              "label": "Stuffed Moroccan pitta",
+              "image": "https://edamam-product-images.s3.amazonaws.com/web-img/75f/75f7254dc1f48f0c37f918744f2e5d7c.jpg?X-Amz-Security-Token=IQoJb3JpZ2luX2VjECsaCXVzLWVhc3QtMSJGMEQCIHRHTtfvGBCkOmKXbzbMY3ITYVXOSzCcEQSpLPIbm2T3AiAOZuD4c8nts4apqV41ImWBXqv5wr%2BnWOUlHxSJ13%2FDDCrCBQjU%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDE4NzAxNzE1MDk4NiIMflli8vYkRQciOhbBKpYFpsijxDFLg7L3vYqrqfYH72pCaZubVs%2BKgbwyqzQh%2F8fqjRuZFyeN4OSoNwqXuL77OG9iuUBtPKARbpPXS6Oq7ZjxbEAHg6oM9VqL0Cb9pZmwNd1BQc5Rolz%2BUMiVpbl%2B%2B%2B%2FN2AnIV4tr3UiZgkoLJmoFiWT1Qr%2BivZe4fcaG02emw7XeSdXZ%2F%2Fiz71EwKCnSQ1qHrj34L4t%2BygphmSpLj9%2FqsB3N8K%2BtF4dM%2FfCaeTEMjUGk6MTyetfn%2FvX38p3wFUG35ZLkEH4zjFcTvNtQpK5lPZaCvSqWeMnOmBxJQvMaFnrdCbnKI4zFEVKsqDHbLR9o2eAw2foH7wqAM5QNq%2FWadpdTXTxnLvv%2FbssDdfIqw80CfcXGTIp%2FDHAKgSXUG%2FtnlMObnuigDZ8nbmsVSyz1SSJJs4DHymSAuY8sguO3bvG%2BEZR6J9goUGyDb4euygIi3XPhxSOLxumwMwiEOQN%2F6xgcft80rxGta%2BftV%2FevlQWMHfSOk9K0V1Fq4q3ot%2BPKclQOdRQKzlUwJvUCkagOXi7PrAlfFH6fAztl1ogPTkmufGDSGZSAMpbhT5UPlkUA3mq%2FzLMB37hkvoqv3aN%2BnAbGdhYP0IdIo6cD0VN1QdlYqI63Prt8EMq95734Z4fK6K2ETYx8K4hNkrTzszbVEbryofi4ijMNAifRdCJqxLqvSgnBmV4xyNBMCF0nd6PIP4xR9ghyNKJsUrJ44sSqq82SvmjHvt%2BHNY6sLr96wtBVWW5Ask8cvJGIe2QYF7QJ47vumB3gLWTGOWST%2F%2FolKtsnu4v3pIWBzfBYDkV9Tdnml5P88LlvVIIHOR0JCsl%2Fav5crOQhq4stHA%2FTM0Kh6fOdCrxbZMEMX0Cmzm0aihdi2Q8w3ffSxwY6sgHRrCvFgpbMi5%2FxBQQdj73RModnruc8Zw5cHAQ2cNBPA5X1bdx4Hwg972xcGCsn66v16a4jgoC9SF70uhDP5e72WzA7%2B3CJ1OOakH2dG1y%2FPwN3l%2FZ2lZwht4p%2BElFRbPgE0WDYGuE1WPm1J1jF2Nm%2FWGYvcfwV4B3Ov81jDGYBuPJfIhObZbQZPiyL91hwlUV7RGWYU64jiPAJGrJFN7KZvbVBHEdTlM46M3gqHw2wgSxX&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20251019T112248Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=ASIASXCYXIIFCQYFBBTS%2F20251019%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=788439aafc0b9b99c0db71a9b67ccaa312fe08147e0913bfe8f7863bf4b3ef2f",
+              "source": "BBC Good Food",
+              "url": "https://www.bbcgoodfood.com/recipes/stuffed-moroccan-pitta",
+              "yield_servings": 4,
+              "ingredientLines": [
+                "2 wheat-free pitta bread pockets",
+                "4 falafels, halved (from Falafels with hummus recipe, in 'goes well with', below right)",
+                "4 tbsp hummus (from Falafels with hummus recipe, see 'goes well with')",
+                "½ red pepper, deseeded and sliced",
+                "handful rocket leaves"
+              ],
+              "calories": 804.3350000000002,
+              "totalTime": 0.0,
+              "cuisineType": [
+                "middle eastern"
+              ],
+              "mealType": [
+                "lunch/dinner"
+              ],
+              "dishType": [
+                "main course"
+              ],
+              "healthLabels": [
+                "Sugar-Conscious",
+                "Vegan",
+                "Vegetarian",
+                "Pescatarian",
+                "Mediterranean",
+                "Dairy-Free",
+                "Egg-Free",
+                "Peanut-Free",
+                "Tree-Nut-Free",
+                "Soy-Free",
+                "Fish-Free",
+                "Shellfish-Free",
+                "Pork-Free",
+                "Red-Meat-Free",
+                "Crustacean-Free",
+                "Celery-Free",
+                "Mustard-Free",
+                "Sesame-Free",
+                "Lupine-Free",
+                "Mollusk-Free",
+                "Alcohol-Free",
+                "Sulfite-Free",
+                "Kosher"
+              ]
+            },
+            "count": 1,
+            "date_added": "2025-10-19T13:24:04.603594"
+          },
+          {
+            "recipe_uri": "http://www.edamam.com/ontologies/edamam.owl#recipe_98444ccb8e444e848f9b8c437e0b59eb",
+            "recipe_data": {
+              "uri": "http://www.edamam.com/ontologies/edamam.owl#recipe_98444ccb8e444e848f9b8c437e0b59eb",
+              "label": "Lemongrass Charred Brussels Sprouts",
+              "image": "https://edamam-product-images.s3.amazonaws.com/web-img/742/742db0862e533e4b37aa9855daab9c82.jpg?X-Amz-Security-Token=IQoJb3JpZ2luX2VjECsaCXVzLWVhc3QtMSJGMEQCIHRHTtfvGBCkOmKXbzbMY3ITYVXOSzCcEQSpLPIbm2T3AiAOZuD4c8nts4apqV41ImWBXqv5wr%2BnWOUlHxSJ13%2FDDCrCBQjU%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDE4NzAxNzE1MDk4NiIMflli8vYkRQciOhbBKpYFpsijxDFLg7L3vYqrqfYH72pCaZubVs%2BKgbwyqzQh%2F8fqjRuZFyeN4OSoNwqXuL77OG9iuUBtPKARbpPXS6Oq7ZjxbEAHg6oM9VqL0Cb9pZmwNd1BQc5Rolz%2BUMiVpbl%2B%2B%2B%2FN2AnIV4tr3UiZgkoLJmoFiWT1Qr%2BivZe4fcaG02emw7XeSdXZ%2F%2Fiz71EwKCnSQ1qHrj34L4t%2BygphmSpLj9%2FqsB3N8K%2BtF4dM%2FfCaeTEMjUGk6MTyetfn%2FvX38p3wFUG35ZLkEH4zjFcTvNtQpK5lPZaCvSqWeMnOmBxJQvMaFnrdCbnKI4zFEVKsqDHbLR9o2eAw2foH7wqAM5QNq%2FWadpdTXTxnLvv%2FbssDdfIqw80CfcXGTIp%2FDHAKgSXUG%2FtnlMObnuigDZ8nbmsVSyz1SSJJs4DHymSAuY8sguO3bvG%2BEZR6J9goUGyDb4euygIi3XPhxSOLxumwMwiEOQN%2F6xgcft80rxGta%2BftV%2FevlQWMHfSOk9K0V1Fq4q3ot%2BPKclQOdRQKzlUwJvUCkagOXi7PrAlfFH6fAztl1ogPTkmufGDSGZSAMpbhT5UPlkUA3mq%2FzLMB37hkvoqv3aN%2BnAbGdhYP0IdIo6cD0VN1QdlYqI63Prt8EMq95734Z4fK6K2ETYx8K4hNkrTzszbVEbryofi4ijMNAifRdCJqxLqvSgnBmV4xyNBMCF0nd6PIP4xR9ghyNKJsUrJ44sSqq82SvmjHvt%2BHNY6sLr96wtBVWW5Ask8cvJGIe2QYF7QJ47vumB3gLWTGOWST%2F%2FolKtsnu4v3pIWBzfBYDkV9Tdnml5P88LlvVIIHOR0JCsl%2Fav5crOQhq4stHA%2FTM0Kh6fOdCrxbZMEMX0Cmzm0aihdi2Q8w3ffSxwY6sgHRrCvFgpbMi5%2FxBQQdj73RModnruc8Zw5cHAQ2cNBPA5X1bdx4Hwg972xcGCsn66v16a4jgoC9SF70uhDP5e72WzA7%2B3CJ1OOakH2dG1y%2FPwN3l%2FZ2lZwht4p%2BElFRbPgE0WDYGuE1WPm1J1jF2Nm%2FWGYvcfwV4B3Ov81jDGYBuPJfIhObZbQZPiyL91hwlUV7RGWYU64jiPAJGrJFN7KZvbVBHEdTlM46M3gqHw2wgSxX&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20251019T112248Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=ASIASXCYXIIFCQYFBBTS%2F20251019%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=cf2af01544c542986c51ab3c364cc059c2d8f1ffa2c03d0571f1045e22d39889",
+              "source": "Epicurious",
+              "url": "https://www.epicurious.com/recipes/food/views/lemongrass-charred-brussels-sprouts",
+              "yield_servings": 4,
+              "ingredientLines": [
+                "1 Tbsp. flavorless oil (such as canola) or coconut oil",
+                "14 oz. brussels sprouts, halved",
+                "1 recipe Fragrant Lemongrass and Lime Dressing",
+                "Fine sea salt, to taste"
+              ],
+              "calories": 320.42904501987505,
+              "totalTime": 0.0,
+              "cuisineType": [
+                "south american"
+              ],
+              "mealType": [
+                "lunch/dinner"
+              ],
+              "dishType": [
+                "main course"
+              ],
+              "healthLabels": [
+                "Sugar-Conscious",
+                "Keto-Friendly",
+                "Vegan",
+                "Vegetarian",
+                "Pescatarian",
+                "Dairy-Free",
+                "Gluten-Free",
+                "Wheat-Free",
+                "Egg-Free",
+                "Peanut-Free",
+                "Tree-Nut-Free",
+                "Soy-Free",
+                "Fish-Free",
+                "Shellfish-Free",
+                "Pork-Free",
+                "Red-Meat-Free",
+                "Crustacean-Free",
+                "Celery-Free",
+                "Mustard-Free",
+                "Sesame-Free",
+                "Lupine-Free",
+                "Mollusk-Free",
+                "Alcohol-Free",
+                "Sulfite-Free",
+                "Kosher"
+              ]
+            },
+            "count": 1,
+            "date_added": "2025-10-19T13:24:09.144013"
+          }
+        ],
         "manual_items": [],
         "checked_items": [],
         "removed_items": [
