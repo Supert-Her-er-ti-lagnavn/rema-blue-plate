@@ -1,5 +1,6 @@
 # Node modules
 node_modules/
+.vite/
 
 # IDE
 .vscode/*
@@ -24,3 +25,4 @@ env/
 # Environment files
 .env.local
 *.local
+.env

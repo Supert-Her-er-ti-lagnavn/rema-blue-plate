@@ -83,6 +83,10 @@ export function useRecipeSearch() {
     setRecipes(newRecipes);
   };
 
+  const updateSessionId = (newSessionId: string) => {
+    setSessionId(newSessionId);
+  };
+
   const clearSearch = () => {
     setSessionId(null);
     setRecipes([]);
@@ -96,6 +100,7 @@ export function useRecipeSearch() {
     error,
     searchRecipes,
     updateRecipes,
+    updateSessionId,
     clearSearch,
   };
 }

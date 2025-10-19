@@ -8,9 +8,10 @@ import { toast } from 'sonner';
 interface FamilySelectorProps {
   onSearch: (selectedUserIds: number[]) => void;
   isSearching?: boolean;
+  onSelectionChange?: (selectedUserIds: number[]) => void; // Callback when selection changes
 }
 
-export function FamilySelector({ onSearch, isSearching = false }: FamilySelectorProps) {
+export function FamilySelector({ onSearch, isSearching = false, onSelectionChange }: FamilySelectorProps) {
   const { user } = useAuth();
   const { familyMembers, isLoading, addFamilyMember, removeFamilyMember } = useFamily();
   const [selectedFamilyIds, setSelectedFamilyIds] = useState<number[]>([]);
@@ -18,11 +19,17 @@ export function FamilySelector({ onSearch, isSearching = false }: FamilySelector
   const [newMemberEmail, setNewMemberEmail] = useState('');
 
   const handleToggleFamilyMember = (memberId: number) => {
-    setSelectedFamilyIds((prev) =>
-      prev.includes(memberId)
+    setSelectedFamilyIds((prev) => {
+      const newSelection = prev.includes(memberId)
         ? prev.filter((id) => id !== memberId)
-        : [...prev, memberId]
-    );
+        : [...prev, memberId];
+
+      // Notify parent of selection change (include current user)
+      const allSelectedIds = user ? [user.id, ...newSelection] : newSelection;
+      onSelectionChange?.(allSelectedIds);
+
+      return newSelection;
+    });
   };
 
   const handleSearch = () => {

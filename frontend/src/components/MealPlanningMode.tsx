@@ -5,6 +5,7 @@ import { FamilySelector } from '@/components/FamilySelector';
 import { ShoppingListPreview } from '@/components/ShoppingListPreview';
 import { ChatPanel } from '@/components/ChatPanel';
 import { useRecipeSearch } from '@/hooks/useRecipeSearch';
+import { useAuth } from '@/contexts/AuthContext';
 import { sampleMeals } from '@/components/sampleMeals';
 import { Loader2 } from 'lucide-react';
 
@@ -22,20 +23,42 @@ export interface Meal {
 }
 
 export const MealPlanningMode: React.FC = () => {
+  const { user } = useAuth();
   const {
     sessionId,
     recipes,
     isLoading,
     searchRecipes,
     updateRecipes,
+    updateSessionId,
   } = useRecipeSearch();
+
+  // Track selected user IDs for chat to use when no session exists
+  // Initialize with current user so chat always has at least one user
+  const [selectedUserIds, setSelectedUserIds] = React.useState<number[]>(
+    user ? [user.id] : []
+  );
+
+  // Update selectedUserIds when user changes (e.g., on login)
+  React.useEffect(() => {
+    if (user && !selectedUserIds.includes(user.id)) {
+      setSelectedUserIds([user.id]);
+    }
+  }, [user, selectedUserIds]);
 
   const handleSearch = async (selectedUserIds: number[]) => {
     await searchRecipes(selectedUserIds);
   };
 
-  const handleRecipesUpdate = (newRecipes: any[]) => {
+  const handleSelectionChange = (userIds: number[]) => {
+    setSelectedUserIds(userIds);
+  };
+
+  const handleRecipesUpdate = (newRecipes: any[], newSessionId?: string) => {
     updateRecipes(newRecipes);
+    if (newSessionId && newSessionId !== sessionId) {
+      updateSessionId(newSessionId);
+    }
   };
 
   // Use backend recipes if available, otherwise show sample meals as default
@@ -46,7 +69,11 @@ export const MealPlanningMode: React.FC = () => {
     <MealPlanningLayout
       leftPanel={
         <>
-          <FamilySelector onSearch={handleSearch} isSearching={isLoading} />
+          <FamilySelector
+            onSearch={handleSearch}
+            isSearching={isLoading}
+            onSelectionChange={handleSelectionChange}
+          />
           <div className="border-t pt-4">
             <ShoppingListPreview />
           </div>
@@ -122,6 +149,7 @@ export const MealPlanningMode: React.FC = () => {
       rightPanel={
         <ChatPanel
           sessionId={sessionId}
+          selectedUserIds={selectedUserIds}
           onRecipesUpdate={handleRecipesUpdate}
         />
       }
