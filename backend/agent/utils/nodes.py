@@ -2,12 +2,210 @@
 
 import random
 import json
-from typing import List
+from typing import List, Dict, Any, Optional
 from agent.utils.state import GraphState
 from agent.utils.tools import search_edamam_recipes
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 from app.config import settings
+
+
+async def construct_search_query(
+    family_info: str,
+    diet_labels: List[str],
+    excluded_ingredients: List[str],
+    custom_preferences: List[str],
+    user_message: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Use GPT to intelligently construct Edamam search parameters.
+
+    Analyzes family preferences and optional user message to decide
+    which Edamam parameters to use for optimal recipe search.
+
+    Args:
+        family_info: Formatted string with family member preferences
+        diet_labels: Health labels from user profiles (e.g., ["vegan", "gluten-free"])
+        excluded_ingredients: Ingredients to exclude (from customPreferences)
+        custom_preferences: User custom preferences/allergies
+        user_message: Optional user request (e.g., "find me fish recipes", "quick italian dinner")
+
+    Returns:
+        Dictionary with Edamam search parameters
+    """
+    llm = ChatOpenAI(model=settings.OPENAI_MODEL, temperature=0.3)
+
+    system_prompt = """You are an expert at constructing recipe search queries for the Edamam Recipe API.
+
+Your task: Analyze family dietary preferences and user requests, then construct optimal Edamam search parameters.
+
+AVAILABLE EDAMAM PARAMETERS:
+
+1. q (query): General search text (e.g., "fish", "pasta", "chicken curry")
+   - Use when user specifies ingredients or dish names
+   - Examples: "fish", "chicken", "chocolate cake"
+
+2. mealType: Array - "breakfast", "lunch", "dinner", "snack", "teatime"
+   - Use when user specifies meal context
+   - Examples: ["dinner"], ["breakfast"]
+
+3. dishType: Array - "main course", "side dish", "soup", "salad", "bread", "dessert", "drinks", "starter"
+   - Use when user specifies dish category
+   - Examples: ["main course"], ["dessert"]
+
+4. cuisineType: Array - "american", "asian", "british", "caribbean", "chinese", "french", "greek",
+   "indian", "italian", "japanese", "korean", "mediterranean", "mexican", "middle eastern", "nordic"
+   - Use when user specifies cuisine preference
+   - Examples: ["italian"], ["asian"]
+
+5. ingr: String - "MIN+", "MIN-MAX", or "MAX" (integers)
+   - Use when user wants simple/complex recipes
+   - Examples: "5-8" (5-8 ingredients), "10+" (10+ ingredients), "5" (max 5)
+
+6. health: Array - From user dietary preferences
+   - Options: "vegan", "vegetarian", "dairy-free", "gluten-free", "peanut-free", "tree-nut-free",
+     "soy-free", "fish-free", "shellfish-free", "pork-free", "kosher", etc.
+   - ALWAYS include these from user profiles
+   - Examples: ["vegan", "dairy-free"], ["gluten-free"]
+
+7. time: String - "MIN+", "MIN-MAX", or "MAX" (minutes)
+   - Use when user wants quick/slow recipes
+   - Examples: "30" (max 30 min), "20-40" (20-40 min), "60+" (60+ min)
+
+8. excluded: Array - Ingredients to exclude
+   - ALWAYS include these from user allergies/dislikes
+   - Extract ingredient names from natural language (e.g., "allergic to nuts" → "nuts")
+   - Examples: ["nuts", "fish"], ["broccoli"]
+
+9. diet: Array - "balanced", "high-fiber", "high-protein", "low-carb", "low-fat", "low-sodium"
+   - Use for specific diet types (different from health restrictions)
+   - Examples: ["high-protein"], ["low-carb"]
+
+CRITICAL INSTRUCTIONS - READ CAREFULLY:
+
+**HANDLING CUSTOM PREFERENCES**:
+- Custom preferences may contain natural language in any language (English, Norwegian, etc.)
+- Extract the key ingredient/allergen name from sentences:
+  - "er allergisk mot nøtter" → extract "nuts" for excluded
+  - "allergic to peanuts" → extract "peanuts" for excluded
+  - "doesn't like broccoli" → extract "broccoli" for excluded
+- If uncertain about extraction, DO NOT include in excluded (better safe than sorry)
+
+**PRIORITY RULE**: User's explicit request ALWAYS OVERRIDES dietary preferences!
+
+1. If NO user message: Use health + excluded from preferences
+2. If user message provided:
+   - FIRST: Analyze what user is asking for
+   - SECOND: Set query parameter based on user request
+   - THIRD: ONLY include health_labels if they DON'T conflict with user request
+
+   **CONFLICT EXAMPLES**:
+   - User asks for "fish" + profile has "vegan" → SET query="fish", IGNORE vegan label, SET health_labels=[]
+   - User asks for "chicken" + profile has "vegetarian" → SET query="chicken", IGNORE vegetarian, SET health_labels=[]
+   - User asks for "cheese pizza" + profile has "dairy-free" → SET query="cheese pizza", IGNORE dairy-free, SET health_labels=[]
+   - User asks for "quick meals" + profile has "vegan" → SET time="30", KEEP health_labels=["vegan"] (no conflict)
+
+**EXAMPLES**:
+- User says "fish dinner", profile is vegan → {"query": "fish", "meal_type": ["dinner"], "health_labels": [], "excluded": []}
+- User says "find me recipes", profile is vegan → {"query": "recipe", "health_labels": ["vegan"], "excluded": [...]}
+- User says "vegan pasta", profile is gluten-free → {"query": "pasta", "health_labels": ["vegan"], "excluded": [...]}
+
+Respond with JSON ONLY:
+{
+    "query": "search text or null",
+    "health_labels": ["ONLY if no conflict with user request"],
+    "excluded": ["from user preferences"],
+    "cuisine_type": ["cuisine" or null],
+    "meal_type": ["meal type" or null],
+    "dish_type": ["dish type" or null],
+    "diet": ["diet label" or null],
+    "ingr": "range or null",
+    "time": "range or null"
+}"""
+
+    if user_message:
+        user_prompt = f"""{family_info}
+
+User dietary preferences:
+- Health labels: {diet_labels}
+- Excluded ingredients: {excluded_ingredients}
+- Custom preferences/allergies: {custom_preferences}
+
+User's request: "{user_message}"
+
+Construct optimal Edamam search parameters."""
+    else:
+        user_prompt = f"""{family_info}
+
+User dietary preferences:
+- Health labels: {diet_labels}
+- Excluded ingredients: {excluded_ingredients}
+- Custom preferences/allergies: {custom_preferences}
+
+User clicked "Search Recipes" with no specific request.
+
+Construct optimal Edamam search parameters for general meal discovery."""
+
+    try:
+        messages = [
+            SystemMessage(content=system_prompt),
+            HumanMessage(content=user_prompt),
+        ]
+
+        print(f"[construct_search_query] Invoking GPT with:")
+        print(f"  - diet_labels: {diet_labels}")
+        print(f"  - excluded_ingredients: {excluded_ingredients}")
+        print(f"  - custom_preferences: {custom_preferences}")
+        print(f"  - user_message: {user_message}")
+
+        response = llm.invoke(messages)
+        content = response.content.strip()
+
+        print(f"[construct_search_query] GPT raw response: {content[:500]}")
+
+        # Extract JSON
+        if "```json" in content:
+            content = content.split("```json")[1].split("```")[0].strip()
+        elif "```" in content:
+            content = content.split("```")[1].split("```")[0].strip()
+
+        params = json.loads(content)
+
+        # Clean up null values (keep empty arrays as they're valid)
+        cleaned_params = {k: v for k, v in params.items() if v is not None and v != ""}
+
+        print(f"[construct_search_query] Final params: {cleaned_params}")
+        return cleaned_params
+
+    except Exception as e:
+        # Fallback: basic search with query, health, and excluded
+        print(f"[construct_search_query] GPT failed, using fallback. Error: {e}")
+        print(f"[construct_search_query] diet_labels: {diet_labels}")
+
+        # Separate health labels from diet labels
+        health_only = []
+        diet_only = []
+
+        for label in diet_labels:
+            label_lower = label.lower()
+            if label_lower in ["balanced", "high-fiber", "high-protein", "low-carb", "low-fat", "low-sodium"]:
+                diet_only.append(label)
+            else:
+                health_only.append(label)
+
+        fallback_params = {
+            "query": "recipe",
+        }
+
+        if health_only:
+            fallback_params["health_labels"] = health_only
+        if diet_only:
+            fallback_params["diet"] = diet_only
+        if excluded_ingredients:
+            fallback_params["excluded"] = excluded_ingredients
+
+        print(f"[construct_search_query] Fallback params: {fallback_params}")
+        return fallback_params
 
 
 async def select_diverse_recipes(state: GraphState) -> GraphState:
@@ -16,14 +214,17 @@ async def select_diverse_recipes(state: GraphState) -> GraphState:
 
     The agent:
     1. Receives family member preferences from state
-    2. Calls search_edamam_recipes tool to get ~30 recipes
-    3. Selects 9+ recipes with 70% smart variety + 30% random discovery
-    4. Returns all recipes if fewer than 9 available
+    2. Uses GPT to intelligently construct Edamam search parameters
+    3. Calls search_edamam_recipes tool to get ~30 recipes
+    4. Selects 9+ recipes with 70% smart variety + 30% random discovery
+    5. Returns all recipes if fewer than 9 available
     """
     # Get family member info and preferences
     family_info = state.get("family_members_info", "")
     diet_labels = state.get("diet_labels", [])
     excluded_ingredients = state.get("excluded_ingredients", [])
+    custom_preferences = state.get("custom_preferences", [])
+    current_message = state.get("current_message", None)
 
     # Check if agent should search (initial search or re-search)
     # If all_recipes is empty, agent needs to search
@@ -34,23 +235,28 @@ async def select_diverse_recipes(state: GraphState) -> GraphState:
         all_recipes = state["all_recipes"]
     else:
         # Agent needs to search Edamam API
-        print(f"Agent searching Edamam API with health_labels={diet_labels}, excluded={excluded_ingredients}")
-
+        # Use GPT to intelligently construct search parameters
         try:
-            # Call the Edamam API tool
+            search_params = await construct_search_query(
+                family_info=family_info,
+                diet_labels=diet_labels,
+                excluded_ingredients=excluded_ingredients,
+                custom_preferences=custom_preferences,
+                user_message=current_message
+            )
+
+            print(f"[select_diverse_recipes] Search params: {search_params}")
+            print(f"[select_diverse_recipes] User message: {current_message}")
+
             all_recipes = await search_edamam_recipes.ainvoke({
-                "health_labels": diet_labels,
-                "excluded": excluded_ingredients,
-                "query": None,  # Agent can decide to use query if needed
+                **search_params,
                 "max_results": 30
             })
 
-            # Update state with fetched recipes
+            print(f"[select_diverse_recipes] Received {len(all_recipes)} recipes from Edamam")
             state["all_recipes"] = all_recipes
-            print(f"Agent fetched {len(all_recipes)} recipes from Edamam")
-
         except Exception as e:
-            print(f"Error calling Edamam API: {e}")
+            print(f"[select_diverse_recipes] Error during search: {e}")
             state["all_recipes"] = []
             state["selected_recipes"] = []
             return state
@@ -137,7 +343,6 @@ Respond with ONLY a JSON array of indices, like: [0, 3, 5, 8, 12, 15, 18, 21, 25
         # Ensure we have at least 9 (or all if fewer available)
         min_required = min(9, len(all_recipes))
         if len(selected) < min_required:
-            print(f"Agent selected only {len(selected)} recipes, falling back to random selection")
             # Fall back: add random recipes to reach 9
             remaining_indices = [i for i in range(len(all_recipes)) if i not in selected_indices]
             needed = min_required - len(selected)
@@ -146,10 +351,8 @@ Respond with ONLY a JSON array of indices, like: [0, 3, 5, 8, 12, 15, 18, 21, 25
                 selected.extend([all_recipes[i] for i in additional])
 
         state["selected_recipes"] = selected
-        print(f"Agent selected {len(selected)} recipes")
 
-    except Exception as e:
-        print(f"Error in agent selection: {e}")
+    except Exception:
         # Fallback: randomly select 9 recipes (or all if fewer)
         num_to_select = min(9, len(all_recipes))
         state["selected_recipes"] = random.sample(all_recipes, num_to_select)
@@ -252,30 +455,23 @@ What is the user's intent and how should I respond?"""
 
         if intent == "change_recipes":
             # User wants different recipes - trigger re-search
-            print(f"User wants different recipes: {current_message}")
             state["action"] = "re_search"
-
-            # Clear recipes to force re-search
             state["all_recipes"] = []
             state["selected_recipes"] = []
 
             # Extract search parameters if provided
             search_params = agent_decision.get("search_params", {})
             if search_params:
-                # Update state with new search parameters
                 if "health_labels" in search_params:
                     state["diet_labels"] = search_params["health_labels"]
                 if "excluded" in search_params:
-                    # Merge with existing excluded ingredients
                     existing = state.get("excluded_ingredients", [])
                     new_excluded = search_params["excluded"]
                     state["excluded_ingredients"] = list(set(existing + new_excluded))
 
         elif intent == "filter":
             # Filter existing recipes
-            print(f"Filtering existing recipes: {current_message}")
             state["action"] = "filter"
-
             indices = agent_decision.get("selected_indices", [])
             if indices:
                 new_selected = [selected_recipes[i] for i in indices if 0 <= i < len(selected_recipes)]
@@ -284,12 +480,9 @@ What is the user's intent and how should I respond?"""
 
         else:  # question
             # Just answer - no changes to recipes
-            print(f"User asked a question: {current_message}")
             state["action"] = "question"
-            # Keep recipes as-is
 
-    except Exception as e:
-        print(f"Error in chat refinement: {e}")
+    except Exception:
         state["action"] = "question"
         state["agent_response"] = "I understand. Let me help you with that."
 
