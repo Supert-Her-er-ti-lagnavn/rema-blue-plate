@@ -15,8 +15,9 @@ class ChatMessage(BaseModel):
 class ChatRequest(BaseModel):
     """Request model for chatting with the agent."""
 
-    session_id: str
+    session_id: str | None = None  # Optional: if None + user_ids provided, create new session
     message: str
+    user_ids: List[int] | None = None  # Optional: for creating session on first message
 
 
 class ChatResponse(BaseModel):
@@ -24,4 +25,5 @@ class ChatResponse(BaseModel):
 
     recipes: List[EdamamRecipe]
     response: str
-    action_taken: str  # "filtered", "re_searched", "no_change"
+    action_taken: str  # "filtered", "re_searched", "no_change", "initial_search"
+    session_id: str | None = None  # Included when new session is created
