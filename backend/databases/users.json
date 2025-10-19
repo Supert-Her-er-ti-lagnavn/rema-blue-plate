@@ -213,6 +213,18 @@
       ],
       "fridge": [],
       "shopping_list": []
+    },
+    {
+      "id": 12,
+      "name": "Lars Magne Stangeland",
+      "email": "lars.magne.stangeland@gmail.com",
+      "family": [],
+      "dietLabels": [
+        "tree-nut-free"
+      ],
+      "customPreferences": [],
+      "fridge": [],
+      "shopping_list": []
     }
   ]
 }
