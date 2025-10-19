@@ -24,3 +24,4 @@ env/
 # Environment files
 .env.local
 *.local
+.env
