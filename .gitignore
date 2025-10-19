@@ -1,6 +1,6 @@
 # Node modules (all locations)
 node_modules/
-frontend/node_modules/
+.vite/
 
 # Build output
 dist/
@@ -36,15 +36,4 @@ pip-wheel-metadata/
 .env.local
 !.env.example
 *.local
-backend/agent/.env*
-backend/app/.env*
-frontend/.env*
-
-# Coverage and reports
-.coverage
-htmlcov/
-
-# Misc
-*.sqlite3
-*.db
-
+.env

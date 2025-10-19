@@ -34,6 +34,7 @@ class EdamamService:
         health_labels: Optional[List[str]] = None,
         excluded: Optional[List[str]] = None,
         included: Optional[List[str]] = None,
+        query: Optional[str] = None,
         max_results: int = 30,
     ) -> List[EdamamRecipe]:
         """
@@ -43,6 +44,7 @@ class EdamamService:
             health_labels: List of health labels (e.g., ["vegan", "dairy-free"])
             excluded: List of ingredients to exclude
             included: List of ingredients to include (if supported by Edamam)
+            query: Search query (e.g., "chicken", "pasta", "dinner")
             max_results: Maximum number of results to return
 
         Returns:
@@ -72,6 +74,15 @@ class EdamamService:
             print("Warning: No valid health labels found. Searching for general recipes.")
             params.append(("q", "dinner"))
 
+        # Add search query if provided
+        # IMPORTANT: Edamam API often needs a 'q' parameter to return results
+        if query:
+            params.append(("q", query))
+        elif not included:
+            # If no query and no included ingredients, use a generic query
+            # This helps Edamam return results even with just health labels
+            params.append(("q", "recipe"))
+
         # Add excluded ingredients as multiple params
         if excluded:
             for ingredient in excluded:
@@ -80,6 +91,8 @@ class EdamamService:
         # Add included ingredients (if provided)
         # Note: Edamam uses 'q' parameter for search query
         if included:
+            # If included ingredients provided, use them as the query
+            # This overrides the generic "recipe" query
             params.append(("q", " ".join(included)))
 
         try:

@@ -10,14 +10,21 @@ interface ChatMessage {
 
 interface ChatPanelProps {
   sessionId: string | null;
-  onRecipesUpdate?: (recipes: any[]) => void;
+  selectedUserIds: number[];
+  onRecipesUpdate?: (recipes: any[], sessionId?: string) => void;
 }
 
-export function ChatPanel({ sessionId, onRecipesUpdate }: ChatPanelProps) {
+export function ChatPanel({ sessionId, selectedUserIds, onRecipesUpdate }: ChatPanelProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(sessionId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Update session ID when it changes from props
+  useEffect(() => {
+    setCurrentSessionId(sessionId);
+  }, [sessionId]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -37,44 +44,55 @@ export function ChatPanel({ sessionId, onRecipesUpdate }: ChatPanelProps) {
     setIsLoading(true);
 
     try {
-      // If we have a session, use the chat endpoint for refinement
-      if (sessionId) {
-        const response = await fetch('http://localhost:8000/api/agent/chat', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            session_id: sessionId,
-            message: userMessage,
-          }),
-        });
+      // Check if we need to provide user_ids for initial search
+      const needsUserIds = !currentSessionId && selectedUserIds.length === 0;
 
-        if (!response.ok) {
-          throw new Error('Failed to get response from agent');
-        }
-
-        const data = await response.json();
-
-        // Add assistant message
-        setMessages((prev) => [
-          ...prev,
-          { role: 'assistant', content: data.response },
-        ]);
-
-        // Update recipes if provided
-        if (data.recipes && onRecipesUpdate) {
-          onRecipesUpdate(data.recipes);
-        }
-      } else {
-        // No session yet - provide helpful response
+      if (needsUserIds) {
+        // No session and no users selected - ask user to select family
         setMessages((prev) => [
           ...prev,
           {
             role: 'assistant',
-            content: 'Please search for recipes first by selecting family members on the left. Once you have recipes, I can help you refine them!',
+            content: 'Please select family members on the left first, then I can search for recipes based on your request!',
           },
         ]);
+        setIsLoading(false);
+        return;
+      }
+
+      // Call chat endpoint (creates session if needed, or refines existing)
+      const response = await fetch('http://localhost:8000/api/agent/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          session_id: currentSessionId,
+          message: userMessage,
+          user_ids: !currentSessionId ? selectedUserIds : undefined, // Only send if no session
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response from agent');
+      }
+
+      const data = await response.json();
+
+      // Add assistant message
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: data.response },
+      ]);
+
+      // Update session ID if this was initial search
+      if (data.session_id && !currentSessionId) {
+        setCurrentSessionId(data.session_id);
+      }
+
+      // Update recipes if provided (pass session ID if new)
+      if (data.recipes && onRecipesUpdate) {
+        onRecipesUpdate(data.recipes, data.session_id || undefined);
       }
     } catch (error: any) {
       toast.error(error.message || 'Failed to send message');
