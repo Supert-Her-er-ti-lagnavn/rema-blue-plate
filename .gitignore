@@ -30,6 +30,16 @@ env/
 .mypy_cache/
 pip-wheel-metadata/
 
+# Python bytecode & caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Test / type-check caches
+.pytest_cache/
+.mypy_cache/
+pip-wheel-metadata/
+
 # Environment files and secrets
 # Keep example files (like .env.example) tracked, but ignore real env files
 .env
